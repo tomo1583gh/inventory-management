@@ -19,7 +19,7 @@ services:
     user: "${UID:-1000}:${GID:-1000}"
     environment:
       HOME: /var/www
-      COMPOSER_HOME: /var/www/.composer
+      COMPOSER_HOME: /tmp/.composer
     volumes:
       - ./src:/var/www
 

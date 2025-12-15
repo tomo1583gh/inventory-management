@@ -11,7 +11,7 @@ install:
 	docker compose exec php composer create-project laravel/laravel=10.* .
 
 perm:
-	docker compose exec php bash -lc "mkdir -p storage bootstrap/cache /var/www/.composer && chmod -R 775 storage bootstrap/cache && chown -R $$(id -u):$$(id -g) /var/www || true"
+	docker compose exec php bash -lc "chmod -R 775 storage bootstrap/cache || true"
 
 key:
 	docker compose exec php php artisan key:generate
