@@ -1,16 +1,10 @@
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-    <meta charset="UTF-8">
-    <meta
-        name="viewport"
-        content="width=device-width,initial-scale=1.0"
-    >
-    <title>入庫登録</title>
-</head>
+@extends('layouts.app')
+
+@section('title', '入庫登録')
+
+@section('content')
 
 <body>
-    <h1>在庫管理アプリ</h1>
     <h2>入庫登録</h2>
 
     <form action="{{ route('stocks.in.store') }}" method="POST">
@@ -89,5 +83,5 @@
     <p>
         <a href="{{ route('items.index') }}">商品登録へ戻る</a>
     </p>
-</body>
-</html>
+
+    @endsection

@@ -1,16 +1,10 @@
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-    <meta charset="UTF-8">
-    <meta 
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
-    <title>商品編集</title>
-</head>
+@extends('layouts.app')
+
+@section('title', '商品登録')
+
+@section('content')
 
 <body>
-    <h1>在庫管理アプリ</h1>
     <h2>商品編集</h2>
 
     @if ($errors->any())
@@ -110,5 +104,5 @@
             商品一覧へ戻る
         </a>
     </p>
-</body>
-</html>
+
+@endsection

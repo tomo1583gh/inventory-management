@@ -1,8 +1,12 @@
 {
   "cSpell.words": [
     "autofocus",
+    "endauth",
     "enderror",
     "endforeach",
+    "endforelse",
+    "endsection",
+    "forelse",
     "onclick"
   ]
 }

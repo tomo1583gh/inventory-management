@@ -1,15 +1,10 @@
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-    <meta charset="UTF-8">
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
-    <title>商品一覧</title>
-</head>
+@extends('layouts.app')
+
+@section('title', '商品一覧')
+
+@section('content')
+
 <body>
-    <h1>在庫管理アプリ</h1>
     <h2>商品一覧</h2>
 
     <p>
@@ -106,6 +101,6 @@
 
         {{ $items->links() }}
     @endif
-</body>
-</html>
+
+@endsection
 

@@ -1,16 +1,10 @@
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-    <meta charset="UTF-8">
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
-    <title>ユーザー登録</title>
-</head>
+@extends('layouts.app')
+
+@section('title', 'ユーザー登録')
+
+@section('content')
 
 <body>
-    <h1>在庫管理アプリ</h1>
     <h2>ユーザー登録</h2>
 
     @if ($errors->any())
@@ -89,5 +83,5 @@
             ログイン画面へ戻る
         </a>
     </p>
-</body>
-</html>
+
+@endsection

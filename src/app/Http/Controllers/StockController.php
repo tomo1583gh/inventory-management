@@ -66,7 +66,38 @@ class StockController extends Controller
      */
     public function index()
     {
-        //
+        $stocks = Item::query()
+            ->leftJoin('categories', 'items.category_id', '=', 'categories.id')
+            ->leftJoin('stock_logs', 'items.id', '=', 'stock_logs.item_id')
+            ->select(
+                'items.id',
+                'items.name',
+                'items.sku',
+                'items.unit',
+                'categories.name as category_name'
+            )
+            ->selectRaw("
+                SUM(
+                    CASE
+                        WHEN stock_logs.type = 'in'
+                        THEN stock_logs.qty
+                        WHEN stock_logs.type = 'out'
+                        THEN stock_logs.qty
+                        ELSE 0
+                    END
+                ) as current_qty
+            ")
+            ->groupBy(
+                'items.id',
+                'items.name',
+                'items.sku',
+                'items.unit',
+                'categories.name'
+            )
+            ->orderBy('items.name')
+            ->paginate(10);
+
+        return view('stocks.index', compact('stocks'));
     }
 
     /**
