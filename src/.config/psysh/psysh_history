@@ -1,0 +1,6 @@
+\App\Models\User::create([
+    'name' => 'テストユーザー',
+    'email' => 'test@example.com',
+    'password' => bcrypt('password'),
+]);
+exit

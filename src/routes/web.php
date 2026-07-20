@@ -1,6 +1,8 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ItemController;
+use App\Http\Controllers\StockController;
 
 /*
 |--------------------------------------------------------------------------
@@ -13,6 +15,32 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
+Route::get('/', fn () => redirect()->route('items.index'));
+
+Route::middleware(['auth'])->group(function () {
+    // 商品管理
+    Route::resource('items', ItemController::class)
+        ->except(['show']);
+
+    // 在庫管理
+    Route::get('/stocks', [StockController::class, 'index'])
+        ->name('stocks.index');
+    
+    // 入庫
+    Route::get('/stocks/in', [StockController::class, 'createIn'])
+        ->name('stocks.in.create');
+
+    Route::post('/stocks/in', [StockController::class, 'storeIn'])
+        ->name('stocks.in.store');
+
+    // 出庫
+    Route::get('/stocks/out', [StockController::class, 'createOut'])
+        ->name('stocks.out.create');
+
+    Route::post('/stocks/out', [StockController::class,'storeOut'])
+        ->name('stocks.out.store');
+
+    // 入出庫履歴
+    Route::get('/stocks/logs', [StockController::class, 'logs'])
+        ->name('stocks.logs');
 });

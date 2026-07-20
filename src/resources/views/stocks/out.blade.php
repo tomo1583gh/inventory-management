@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+    <title>出庫登録</title>
+</head>
+
+<body>
+    <h1>在庫管理アプリ</h1>
+    <h2>出庫登録</h2>
+
+    <form action="{{ route('stocks.out.store') }}" method="POST">
+        @csrf
+
+        <div>
+            <label for="item_id">商品</label>
+
+            <select id="item_id" name="item_id">
+                <option value="">選択してください</option>
+
+                @foreach ($items as $item)
+                    <option
+                        value="{{ $item->id}}"
+                        @selected(old('item_id') == $item->id)
+                    >
+                        {{ $item->name }}
+                        ({{ $item->sku }})
+                    </option>
+                @endforeach
+            </select>
+
+            @error('item_id')
+                <p>{{ $message }}</p>
+            @enderror
+        </div>
+
+        <div>
+            <label for="qty">数量</label>
+
+            <input
+                id="qty"
+                type="number"
+                name="qty"
+                value="{{ old('qty') }}"
+                step="0.01"
+                min="0.01"
+            >
+
+            @error('qty')
+                <p>{{ $message }}</p>
+            @enderror
+        </div>
+
+        <div>
+            <label for="acted_at">作業日</label>
+
+            <input
+                id="acted_at"
+                type="date"
+                name="acted_at"
+                value="{{ old('acted_at', date('Y-m-d')) }}"
+            >
+
+            @error('acted_at')
+                <p>{{ $message }}</p>
+            @enderror
+        </div>
+
+        <div>
+            <label for="note">メモ</label>
+
+            <textarea
+                id="note"
+                name="note"
+            >{{ old('note') }}</textarea>
+
+            @error('note')
+                <p>{{ $message }}</p>
+            @enderror
+        </div>
+
+        <button type="submit">出庫を登録</button>
+    </form>
+
+    <p>
+        <a href="{{ route('items.index') }}">商品一覧へ戻る</a>
+    </p>
+</body>
+</html>

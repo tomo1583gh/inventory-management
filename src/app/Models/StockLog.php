@@ -1,0 +1,33 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+
+class StockLog extends Model
+{
+    protected $fillable = [
+        'item_id',
+        'type',
+        'qty',
+        'note',
+        'acted_at',
+        'user_id',
+    ];
+
+    protected $casts = [
+        'qty' => 'decimal:2',
+        'acted_at' => 'date',
+    ];
+
+    public function item(): BelongsTo
+    {
+        return $this->belongsTo(Item::class);
+    }
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
+}
