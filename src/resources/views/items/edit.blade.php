@@ -4,7 +4,7 @@
 
 @section('content')
 
-<body>
+
     <h2>商品編集</h2>
 
     @if ($errors->any())

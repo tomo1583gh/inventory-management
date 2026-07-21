@@ -16,16 +16,35 @@ class ItemController extends Controller
     public function index(Request $request)
     {
         $q = $request->input('q');
+        $sku = $request->input('sku');
+        $categoryId = $request->input('category_id');
 
         $items = Item::with('category')
             ->when($q, function ($query, $q) {
                 $query->where('name', 'like', "%{$q}%");
             })
+            ->when($sku,function ($query, $sku) {
+                $query->where('sku', 'like', "%{$sku}%");
+            })
+            ->when($categoryId, function ($query, $categoryId) {
+                $query->where('category_id', $categoryId);
+            })
             ->orderByDesc('id')
             ->paginate(10)
             ->withQueryString();
 
-            return view('items.index', compact('items', 'q'));
+        $categories = Category::orderBy('name')->get();
+
+            return view(
+                'items.index',
+                compact(
+                    'items', 
+                    'q',
+                    'sku',
+                    'categoryId',
+                    'categories'
+                )
+            );
     }
 
     /**

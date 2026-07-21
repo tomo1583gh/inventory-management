@@ -4,7 +4,7 @@
 
 @section('content')
 
-<body>
+
     <h2>出庫登録</h2>
 
     <form action="{{ route('stocks.out.store') }}" method="POST">

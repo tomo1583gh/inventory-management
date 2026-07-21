@@ -4,7 +4,7 @@
 
 @section('content')
 
-<body>
+
     <h2>商品一覧</h2>
 
     <p>
@@ -31,23 +31,59 @@
         商品を登録する
     </a>
 
-    <form 
-        action="{{ route('items.index') }}" 
-        method="GET"
-    >
+    <form action="{{ route('items.index') }}" method="GET"> 
+        
+        <div>
+            <label for="category_id">カテゴリー</label>
 
-        <input
-            type="text"
-            name="q"
-            value="{{ $q ?? '' }}"
-            placeholder="商品名を入力"
-        >
+            <select id="category_id" name="category_id">
 
-        <button type="submit">検索</button>
+                <option value="">
+                    すべて
+                </option>
+
+                @foreach($categories as $category)
+
+                    <option
+                        value="{{ $category->id }}"
+                        @selected($categoryId == $category->id)
+                    >
+                        {{ $category->name }}
+                    </option>
+                @endforeach
+            </select>
+        </div>
+
+        <div>
+            <label for="q">商品名</label>
+
+            <input
+                id="q"
+                type="text"
+                name="q"
+                value="{{ $q }}"
+            >
+        </div>
+
+        <div>
+            <label for="sku">管理番号</label>
+
+            <input
+                id="sku"
+                type="text"
+                name="sku"
+                value="{{ $sku ?? '' }}"
+            >
+        </div>
+
+        <button type="submit">
+            検索
+        </button>
 
         <a href="{{ route('items.index') }}">
             リセット
         </a>
+
     </form>
 
     @if ($items->isEmpty())
@@ -57,7 +93,7 @@
             <thead>
                 <tr>
                     <th>ID</th>
-                    <th>カテゴリー
+                    <th>カテゴリー</th>
                     <th>商品名</th>
                     <th>管理番号</th>
                     <th>単位</th>

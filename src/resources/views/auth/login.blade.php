@@ -4,7 +4,7 @@
 
 @section('content')
 
-<body>
+
     <h2>ログイン</h2>
 
     @if ($errors->any())

@@ -4,7 +4,7 @@
 
 @section('content')
 
-<body>
+
     <h2>入出庫履歴</h2>
 
     @if (session('success'))

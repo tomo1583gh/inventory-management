@@ -4,7 +4,7 @@
 
 @section('content')
 
-<body>
+
     <h2>ユーザー登録</h2>
 
     @if ($errors->any())

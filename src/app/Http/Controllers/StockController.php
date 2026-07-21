@@ -82,7 +82,7 @@ class StockController extends Controller
                         WHEN stock_logs.type = 'in'
                         THEN stock_logs.qty
                         WHEN stock_logs.type = 'out'
-                        THEN stock_logs.qty
+                        THEN -stock_logs.qty
                         ELSE 0
                     END
                 ) as current_qty
