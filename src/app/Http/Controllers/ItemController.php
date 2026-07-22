@@ -19,32 +19,67 @@ class ItemController extends Controller
         $sku = $request->input('sku');
         $categoryId = $request->input('category_id');
 
+        $sort = $request->input('sort', 'created_at');
+        $direction = $request->input('direction', 'desc');
+
+        $allowedSorts = [
+            'name',
+            'category',
+            'created_at',
+        ];
+
+        $allowedDirections = [
+            'asc',
+            'desc',
+        ];
+
+        if (!in_array($sort, $allowedSorts, true)) {
+            $sort = 'created_at';
+        }
+
+        if (!in_array($direction, $allowedDirections, true)) {
+            $direction = 'desc';
+        }
+
         $items = Item::with('category')
             ->when($q, function ($query, $q) {
-                $query->where('name', 'like', "%{$q}%");
+                $query->where('items.name', 'like', "%{$q}%");
             })
             ->when($sku,function ($query, $sku) {
-                $query->where('sku', 'like', "%{$sku}%");
+                $query->where('items.sku', 'like', "%{$sku}%");
             })
             ->when($categoryId, function ($query, $categoryId) {
-                $query->where('category_id', $categoryId);
-            })
-            ->orderByDesc('id')
+                $query->where('items.category_id', $categoryId);
+            });
+
+        if ($sort === 'category') {
+            $items->leftJoin(
+                'categories',
+                'items.category_id',
+                '=',
+                'categories.id'
+            )
+            ->select('items.*')
+            ->orderBy('categories.name', $direction);
+        } else {
+            $items->orderBy("items.{$sort}", $direction);
+        }
+
+        $items = $items
             ->paginate(10)
-            ->withQueryString();
+            ->appends($request->query());
 
         $categories = Category::orderBy('name')->get();
 
-            return view(
-                'items.index',
-                compact(
+            return view('items.index',compact(
                     'items', 
                     'q',
                     'sku',
                     'categoryId',
-                    'categories'
-                )
-            );
+                    'categories',
+                    'sort',
+                    'direction'
+            ));
     }
 
     /**

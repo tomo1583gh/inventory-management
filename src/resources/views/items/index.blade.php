@@ -76,6 +76,20 @@
             >
         </div>
 
+        <div>
+            <label for="direction">順序</label>
+
+            <select id="direction" name="direction">
+                <option value="asc" @selected($direction == 'asc')>
+                    昇順
+                </option>
+
+                <option value="desc" @selected($direction == 'desc')>
+                    降順
+                </option>
+            </select>
+        </div>
+
         <button type="submit">
             検索
         </button>
@@ -89,12 +103,60 @@
     @if ($items->isEmpty())
         <p>商品が登録されていません。</p>
     @else
+
+        @php
+            $nextDirection = $direction === 'asc' ? 'desc' : 'asc';
+        @endphp
+
         <table border="1">
             <thead>
                 <tr>
+                    <th>
+                        <a href="{{ route('items.index', array_merge(request()->query(), [
+                            'sort' => 'created_at',
+                            'direction' => $sort === 'created_at'
+                                ? $nextDirection
+                                : 'desc',
+                            'page' => 1,
+                        ])) }}">
+                            登録日
+
+                            @if ($sort === 'created_at')
+                                {{ $direction === 'asc' ? '▲' : '▼' }}
+                            @endif
+                        </a>
+                    </th>
                     <th>ID</th>
-                    <th>カテゴリー</th>
-                    <th>商品名</th>
+                    <th>
+                        <a href="{{ route('items.index', array_merge(request()->query(),[
+                        'sort' => 'category',
+                        'direction' => $sort === 'category'
+                            ? $nextDirection
+                            : 'asc',
+                        'page' => 1,
+                        ])) }}">
+                            カテゴリー
+                        
+                            @if ($sort === 'category')
+                                {{ $direction === 'asc' ? '▲' : '▼' }}
+                            @endif
+                        </a>
+                    </th>
+                    <th>
+                        <a href="{{ route('items.index', array_merge(request()->query(),[
+                            'sort' => 'name',
+                            'direction' => $sort === 'name'
+                                ? $nextDirection
+                                : 'asc',
+                            'page' => 1,
+                        ])) }}">
+                            商品名
+                        
+                        @if ($sort === 'name')
+                            {{ $direction === 'asc' ? '▲' : '▼' }}
+                        @endif
+                        </a>
+                    </th>
                     <th>管理番号</th>
                     <th>単位</th>
                     <th>操作</th>
@@ -104,6 +166,7 @@
             <tbody>
                 @foreach ($items as $item)
                     <tr>
+                        <td>{{ $item->created_at->format('Y/m/d') }}</td>
                         <td>{{ $item->id }}</td>
                         <td>{{ $item->category?->name ?? '未設定' }}</td>
                         <td>{{ $item->name }}</td>
