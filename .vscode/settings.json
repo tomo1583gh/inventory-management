@@ -5,6 +5,7 @@
     "enderror",
     "endforeach",
     "endforelse",
+    "endphp",
     "endsection",
     "forelse",
     "onclick"

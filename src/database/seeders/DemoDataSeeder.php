@@ -7,7 +7,7 @@ use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
-class DemoDateSeeder extends Seeder
+class DemoDataSeeder extends Seeder
 {
     /**
      * デモデータを登録する
@@ -30,7 +30,7 @@ class DemoDateSeeder extends Seeder
             $userId = DB::table('users')->insertGetId([
                 'name' =>'デモユーザー',
                 'email' => 'demo@example.com',
-                'password' => Hash::male('password'),
+                'password' => Hash::make('password'),
                 'email_verified_at' => now(),
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -48,7 +48,7 @@ class DemoDateSeeder extends Seeder
         |   ・肥料
         |   ・農薬
         |   ・資材
-        |   ・育苗
+        |   ・種苗
         |   ・その他
         |
         */
@@ -62,7 +62,7 @@ class DemoDateSeeder extends Seeder
         | 商品データ
         |-------------------------------------------------
         |
-        | target_qtyは、入出庫履歴を集計した語の現在個です。
+        | target_qtyは、入出庫履歴を集計した後の現在個です。
         |
         */
 
@@ -295,6 +295,144 @@ class DemoDateSeeder extends Seeder
             * 商品ごとに登録日をずらす
             * 登録日順の並び替えテストに使用する
             */
+            $itemCreatedAt = Carbon::now()
+                ->subDays(count($items) - $index + 7);
+
+            /*
+            *同じSKUの商品がある場合は再登録しない
+            */
+            $existingItem = DB::table('items')
+                ->where('sku', $itemData['sku'])
+                ->first();
+            
+                if ($existingItem) {
+                    $itemId = $existingItem->id;
+                } else {
+                    $itemId = DB::table('items')->insertGetId([
+                        'name' => $itemData['name'],
+                        'sku' => $itemData['sku'],
+                        'unit' => $itemData['unit'],
+                        'category_id' => $categoryIds[$itemData['category']],
+                        'created_at' => $itemCreatedAt,
+                        'updated_at' => $itemCreatedAt,
+                    ]);
+
+                    $this->createStockLogs(
+                        $itemId,
+                        $userId,
+                        $itemData['target_qty'],
+                        $itemCreatedAt
+                    );
+                }
+
+                $createdItemIds[] = $itemId;
+            }
+
+            /*
+            * ダッシュボードの「本日の入庫・出庫件数」を 
+            * 確認できるように、本日の履歴も作成する　
+            *  
+            * 入庫と出庫を同数にしているため、
+            * 最終的な現在地は変わらない
+            */
+            $this->createTodayStockLogs(
+                $createdItemIds,
+                $userId
+            );
+        }
+
+        /**
+         * 指定した現在庫になるように入出庫履歴を作成する
+        */
+        private function createStockLogs(
+            int $itemId,
+            int $userId,
+            int $targetQty,
+            Carbon $baseDate
+        ): void {
+            $firstOutQty = ($itemId % 5) + 3;
+            $secondOutQty = ($itemId % 4) + 1;
+
+            $totalOutQty = $firstOutQty + $secondOutQty;
+            $initialInQty = $targetQty + $totalOutQty;
+
+            $firstInDate = $baseDate->copy()->addDay();
+            $firstOutDate = $baseDate->copy()->addDays(3);
+            $secondOutDate = $baseDate->copy()->addDays(5);
+
+            DB::table('stock_logs')->insert([
+                [
+                    'item_id' => $itemId,
+                    'user_id' => $userId,
+                    'type' => 'in',
+                    'qty' => $initialInQty,
+                    'acted_at' => $firstInDate,
+                    'created_at' => $firstInDate,
+                    'updated_at' => $firstInDate,
+                ],
+                [
+                    'item_id' => $itemId,
+                    'user_id' => $userId,
+                    'type' => 'out',
+                    'qty' => $firstOutQty,
+                    'acted_at' => $firstOutDate,
+                    'created_at' => $firstOutDate,
+                    'updated_at' => $firstOutDate,
+                ],
+                [
+                    'item_id' => $itemId,
+                    'user_id' => $userId,
+                    'type' => 'out',
+                    'qty' => $secondOutQty,
+                    'acted_at' => $secondOutDate,
+                    'created_at' => $secondOutDate,
+                    'updated_at' => $secondOutDate,
+                ],
+            ]);
+        }
+
+        /*
+        * ダッシュボード確認用の本日の入出庫履歴を作成する
+        */
+        private function createTodayStockLogs(
+            array $itemIds,
+            int $userId
+        ): void {
+            $todayDemoExists = DB::table('stock_logs')
+                ->whereDate('acted_at', today())
+                ->whereIn('item_id', array_slice($itemIds, 0, 3))
+                ->exists();
+
+            if ($todayDemoExists) {
+                return;
+            }
+
+            foreach (array_slice($itemIds, 0, 3) as $index => $itemId) {
+                $qty = $index + 1;
+                $actedAt = now();
+
+                DB::table('stock_logs')->insert([
+                    [
+                        'item_id' => $itemId,
+                        'user_id' => $userId,
+                        'type' => 'in',
+                        'qty' => $qty,
+                        'acted_at' => $actedAt,
+                        'created_at' => $actedAt,
+                        'updated_at' => $actedAt, 
+                    ],
+                    [
+                        'item_id' => $itemId,
+                        'user_id' => $userId,
+                        'type' => 'out',
+                        'qty' => $qty,
+                        'acted_at' => $actedAt,
+                        'created_at' => $actedAt,
+                        'updated_at' => $actedAt,
+                    ],
+                ]);
+            }
         }
     }
-}
+
+

@@ -4,3 +4,14 @@
     'password' => bcrypt('password'),
 ]);
 exit
+App\Models\Item::count();
+App\Models\Category::count();
+App\Models\StockLog::count();
+exit
+App\Models\Item::count();
+App\Models\Category::count();
+App\Models\StockLog::count();
+App\Models\Item::count();
+App\Models\Category::count();
+App\Models\StockLog::count();
+exit
