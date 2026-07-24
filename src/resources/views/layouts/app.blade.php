@@ -4,6 +4,10 @@
 <head>
     <meta charset="UTF-8">
     <title>@yield('title', '在庫管理システム')</title>
+    <link rel="stylesheet" href="{{ asset('css/app.css') }}">
+
+    @yield('css')
+
 </head>
 
 <body>

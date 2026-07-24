@@ -26,6 +26,7 @@ class ItemStoreRequest extends FormRequest
             'name' => ['required', 'string', 'max:255'],
             'sku'  => ['required', 'string', 'max:255', 'unique:items,sku'],
             'unit' => ['required', 'string', 'max:50'],
+            'minimum_stock' => ['required', 'integer', 'min:0'],
         ];
     }
 }

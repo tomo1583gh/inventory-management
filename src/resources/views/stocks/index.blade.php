@@ -1,5 +1,9 @@
 @extends('layouts.app')
 
+@section('css')
+    <link rel="stylesheet" href="{{ asset('css/stocks.css') }}">
+@endsection
+
 @section('title', '在庫一覧')
 
 @section('content')
@@ -35,13 +39,14 @@
                         ? 'desc'
                         : 'asc',
             ]) }}">
-                現在個数
+                現在庫数
             
                 @if ($sort === 'stock')
                     {{ $direction === 'asc' ? '▲' : '▼' }}
                 @endif
             </a>
         </th>
+        <th>最低在庫数</th>
     </tr>
 
     @forelse($stocks as $stock)
@@ -51,7 +56,30 @@
         <td>{{ $stock->name }}</td>
         <td>{{ $stock->sku }}</td>
         <td>{{ $stock->unit }}</td>
-        <td>{{ $stock->current_qty ?? 0 }}</td>
+        <td class="text-right">
+
+            <span
+                class="
+                    @if ($stock->current_qty <= 0)
+                        stock-out
+                    @elseif (
+                        $stock->minimum_stock > 0 &&
+                        $stock->current_qty <= $stock->minimum_stock
+                    )
+                        stock-low
+                    @endif
+                "
+            >
+                @if (floor($stock->current_qty) == $stock->current_qty)
+                    {{ number_format($stock->current_qty, 0) }}
+                @else
+                    {{ number_format($stock->current_qty, 2) }}
+                @endif
+            </span>
+        </td>
+        <td class="text-right">
+            {{ $stock->minimum_stock }}
+        </td>
     </tr>
 
     @empty

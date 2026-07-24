@@ -112,6 +112,7 @@ class StockController extends Controller
                 'items.name',
                 'items.sku',
                 'items.unit',
+                'items.minimum_stock',
                 'categories.name as category_name'
             )
             ->selectRaw("
@@ -135,6 +136,7 @@ class StockController extends Controller
                 'items.name',
                 'items.sku',
                 'items.unit',
+                'items.minimum_stock',
                 'categories.name'
             )
             ->when(

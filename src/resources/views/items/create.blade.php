@@ -93,6 +93,22 @@
             @enderror
         </div>
 
+        <div>
+            <label for="minimum_stock">最低在庫数</label>
+
+            <input
+                type="number"
+                id="minimum_stock"
+                name="minimum_stock"
+                min="0"
+                value="{{ old('minimum_stock', 0) }}"
+            >
+
+            @error('minimum_stock')
+                <p>{{ $message }}</p>
+            @enderror
+        </div>
+
         <button type="submit">
             登録
         </button>

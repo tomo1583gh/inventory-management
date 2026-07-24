@@ -13,7 +13,8 @@ class Item extends Model
         'category_id',
         'name', 
         'sku', 
-        'unit'
+        'unit',
+        'minimum_stock',
     ];
 
     public function category(): BelongsTo
