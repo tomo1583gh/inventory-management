@@ -10,9 +10,38 @@
 
     <tr>
         <th>カテゴリー</th>
-        <th>商品名</th>
+        <th>
+            <a href="{{ route('stocks.index', [
+                'sort' => 'name',
+                'direction' =>
+                    $sort === 'name' && $direction === 'asc'
+                        ? 'desc'
+                        : 'asc',
+            ]) }}">
+                商品名
+                
+                @if ($sort === 'name')
+                    {{ $direction === 'asc' ? '▲' : '▼' }}
+                @endif
+            </a>
+        </th>
         <th>管理番号</th>
-        <th>現在個数</th>
+        <th>単位</th>
+        <th>
+            <a href="{{ route('stocks.index',[
+                'sort' => 'stock',
+                'direction' =>
+                    $sort === 'stock' && $direction === 'asc'
+                        ? 'desc'
+                        : 'asc',
+            ]) }}">
+                現在個数
+            
+                @if ($sort === 'stock')
+                    {{ $direction === 'asc' ? '▲' : '▼' }}
+                @endif
+            </a>
+        </th>
     </tr>
 
     @forelse($stocks as $stock)
@@ -21,8 +50,8 @@
         <td>{{ $stock->category_name ?? '未設定' }}</td>
         <td>{{ $stock->name }}</td>
         <td>{{ $stock->sku }}</td>
-        <td>{{ $stock->current_qty ?? 0 }}</td>
         <td>{{ $stock->unit }}</td>
+        <td>{{ $stock->current_qty ?? 0 }}</td>
     </tr>
 
     @empty

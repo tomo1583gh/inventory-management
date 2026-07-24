@@ -6,6 +6,7 @@ use App\Http\Requests\StockInRequest;
 use App\Http\Requests\StockOutRequest;
 use App\Models\StockLog;
 use App\Models\Item;
+use Illuminate\Http\Request;
 
 class StockController extends Controller
 {
@@ -64,11 +65,48 @@ class StockController extends Controller
     /**
      * 在庫一覧
      */
-    public function index()
+    public function index(Request $request)
     {
+        $sort = $request->input('sort', 'name');
+        $direction = $request->input('direction','asc');
+
+        $allowedSorts = [
+            'name',
+            'stock',
+        ];
+
+        $allowedDirections = [
+            'asc',
+            'desc',
+        ];
+
+        /*
+        * 許可していない並び替え項目が指定された場合は商品名順に戻す
+        */
+        if (!in_array($sort, $allowedSorts,true)) {
+            $sort = 'name';
+        }
+
+        /*
+        * asc , desc以外が指定された場合は昇順に戻す。
+        */
+        if (!in_array($direction, $allowedDirections,true)) {
+            $direction = 'asc';
+        }
+
         $stocks = Item::query()
-            ->leftJoin('categories', 'items.category_id', '=', 'categories.id')
-            ->leftJoin('stock_logs', 'items.id', '=', 'stock_logs.item_id')
+            ->leftJoin(
+                'categories',
+                'items.category_id',
+                '=',
+                'categories.id'
+            )
+            ->leftJoin(
+                'stock_logs',
+                'items.id',
+                '=',
+                'stock_logs.item_id'
+            )
             ->select(
                 'items.id',
                 'items.name',
@@ -77,14 +115,19 @@ class StockController extends Controller
                 'categories.name as category_name'
             )
             ->selectRaw("
-                SUM(
-                    CASE
-                        WHEN stock_logs.type = 'in'
-                        THEN stock_logs.qty
-                        WHEN stock_logs.type = 'out'
-                        THEN -stock_logs.qty
-                        ELSE 0
-                    END
+                COALESCE(
+                    SUM(
+                        CASE
+                            WHEN stock_logs.type = 'in'
+                            THEN stock_logs.qty
+                            
+                            WHEN stock_logs.type = 'out'
+                            THEN -stock_logs.qty
+                            
+                            ELSE 0
+                        END
+                    ),
+                    0
                 ) as current_qty
             ")
             ->groupBy(
@@ -94,10 +137,26 @@ class StockController extends Controller
                 'items.unit',
                 'categories.name'
             )
-            ->orderBy('items.name')
-            ->paginate(10);
+            ->when(
+                $sort === 'stock',
+                function ($query) use ($direction) {
+                    $query->orderBy('current_qty', $direction);
+                },
+                function ($query) use ($direction) {
+                    $query->orderBy('items.name', $direction);
+                }
+            )
+            ->paginate(10)
+            ->withQueryString();
 
-        return view('stocks.index', compact('stocks'));
+        return view(
+            'stocks.index', 
+            compact(
+                'stocks',
+                'sort',
+                'direction'
+            )
+        );
     }
 
     /**
