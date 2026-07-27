@@ -31,7 +31,9 @@
                 @foreach ($logs as $log)
                     <tr>
                         <td>{{ $log->acted_at->format('Y-m-d') }}</td>
-                        <td>{{ $log->item->name }}</td>
+                        <td class="text-center">
+                            {{ $log->item->name }}
+                        </td>
                         <td>{{ $log->type === 'in' ? '入庫' : '出庫' }}</td>
                         <td class="text-right">
                             @if (floor($log->qty) == $log->qty)
@@ -40,9 +42,15 @@
                                 {{ number_format($log->qty, 2) }}
                             @endif
                         </td>
-                        <td>{{ $log->item->unit }}</td>
-                        <td>{{ $log->user->name }}</td>
-                        <td>{{ $log->note ?? '-' }}</td>
+                        <td class="text-center">
+                            {{ $log->item->unit }}
+                        </td>
+                        <td class="text-center">
+                            {{ $log->user->name }}
+                        </td>
+                        <td class="text-center">
+                            {{ $log->note ?? '-' }}
+                        </td>
                     </tr>
                 @endforeach
             </tbody>

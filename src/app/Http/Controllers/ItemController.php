@@ -137,4 +137,14 @@ class ItemController extends Controller
             ->route('items.index')
             ->with('success', '商品を削除しました。');
     }
+
+    /*
+    * 商品詳細画面
+    */
+    public function show(Item $item)
+    {
+        $item->load('category');
+
+        return view('items.show', compact('item'));
+    }
 }

@@ -52,10 +52,18 @@
     @forelse($stocks as $stock)
 
     <tr>
-        <td>{{ $stock->category_name ?? '未設定' }}</td>
-        <td>{{ $stock->name }}</td>
-        <td>{{ $stock->sku }}</td>
-        <td>{{ $stock->unit }}</td>
+        <td class="text-center">
+            {{ $stock->category_name ?? '未設定' }}
+        </td>
+        <td class="text-center">
+            {{ $stock->name }}
+        </td>
+        <td class="text-center">
+            {{ $stock->sku }}
+        </td>
+        <td class="text-center">
+            {{ $stock->unit }}
+        </td>
         <td class="text-right">
 
             <span

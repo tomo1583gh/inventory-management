@@ -168,10 +168,14 @@
                     <tr>
                         <td>{{ $item->created_at->format('Y/m/d') }}</td>
                         <td>{{ $item->id }}</td>
-                        <td>{{ $item->category?->name ?? '未設定' }}</td>
-                        <td>{{ $item->name }}</td>
-                        <td>{{ $item->sku }}</td>
-                        <td>{{ $item->unit }}</td>
+                        <td class="text-center">{{ $item->category?->name ?? '未設定' }}</td>
+                        <td class="text-center">
+                            <a href="{{ route('items.show', $item) }}">
+                                {{ $item->name }}
+                            </a>
+                        </td>
+                        <td class="text-center">{{ $item->sku }}</td>
+                        <td class="text-center">{{ $item->unit }}</td>
                         <td>
                             <a href="{{ route('items.edit', $item) }}">
                                 編集

@@ -43,4 +43,8 @@ Route::middleware(['auth'])->group(function () {
     // 入出庫履歴
     Route::get('/stocks/logs', [StockController::class, 'logs'])
         ->name('stocks.logs');
+
+    // 商品詳細
+    Route::get('/items/{item}', [ItemController::class, 'show'])
+        ->name('items.show');
 });
