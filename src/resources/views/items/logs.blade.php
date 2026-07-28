@@ -31,10 +31,11 @@
     <thead>
         <tr>
             <th>日時</th>
-            <th>カテゴリー</th>
+            <th>区分</th>
             <th>数量</th>
             <th>担当者</th>
-            <th>商品メモ</th>
+            <th>入出庫メモ</th>
+            <th>操作</th>
         </tr>
     </thead>
 
@@ -70,12 +71,35 @@
                 {{ $log->note }}
             </td>
 
+            <td>
+                @if ($log->corrected_log_id !== null)
+                    <strong>修正理由:</strong>
+                    {!! nl2br(e($log->correction_reason ?? '')) !!}
+                @else
+                    {!! nl2br(e($log->note ?? '')) !!}
+                @endif
+            </td>
+
+            <td class="text-center">
+                @if ($log->corrected_log_id !== null)
+                    訂正記録
+
+                @elseif ($log->correctionLog !== null)
+                    訂正済み
+                
+                @else
+                    <a href="{{ route('stock-logs.corrections.create',$log) }}">
+                        訂正
+                    </a>
+                @endif
+            </td>
+
         </tr>
 
         @empty
       
         <tr>
-            <td colspan="5" class="text=center">
+            <td colspan="6" class="text=center">
                 入出庫履歴はありません。
             </td>
         </tr>

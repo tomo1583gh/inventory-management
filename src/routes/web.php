@@ -53,4 +53,15 @@ Route::middleware(['auth'])->group(function () {
         '/items/{item}/logs',
         [StockController::class,'itemLogs']
     )->name('items.logs');
+
+    // 入出庫履歴訂正機能
+    Route::get(
+        '/stock-logs/{stockLog}/correct',
+        [StockController::class,'createCorrection']
+    )->name('stock-logs.corrections.create');
+
+    Route::post(
+        '/stock-logs/{stockLog}/correct',
+        [StockController::class, 'storeCorrection']
+    )->name('stock-logs.corrections.store');
 });

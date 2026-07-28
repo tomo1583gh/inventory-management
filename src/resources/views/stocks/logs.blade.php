@@ -17,13 +17,14 @@
         <table border="1">
             <thead>
                 <tr>
-                    <th>作業日</th>
+                    <th>日時</th>
                     <th>商品</th>
                     <th>区分</th>
                     <th>数量</th>
                     <th>単位</th>
                     <th>担当者</th>
                     <th>入出庫メモ</th>
+                    <th>操作</th>
                 </tr>
             </thead>
 
@@ -49,7 +50,24 @@
                             {{ $log->user->name }}
                         </td>
                         <td class="text-center">
-                            {{ $log->note ?? '-' }}
+                            @if ($log->corrected_log_id)
+                                <strong>訂正理由 : </strong>
+                                {!! nl2br(e($log->correction_reason)) !!}
+                            @else
+                                {!! nl2br(e($log->note ?? '-')) !!}
+                            @endif
+                        </td>
+
+                        <td class="text-center">
+                            @if ($log->corrected_log_id)
+                                訂正記録
+                            @elseif ($log->correctionLog)
+                                訂正済み
+                            @else
+                                <a href="{{ route('stock-logs.corrections.create', $log) }}">
+                                    訂正
+                                </a>
+                            @endif
                         </td>
                     </tr>
                 @endforeach

@@ -7,6 +7,8 @@ use App\Http\Requests\StockOutRequest;
 use App\Models\StockLog;
 use App\Models\Item;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use App\Http\Requests\StockCorrectionRequest;
 
 class StockController extends Controller
 {
@@ -167,6 +169,12 @@ class StockController extends Controller
     public function logs()
     {
         $logs = StockLog::with(['item', 'user'])
+        ->with([
+            'item.category',
+            'user',
+            'correctedLog',
+            'correctionLog',
+        ])
         ->orderByDesc('acted_at')
         ->orderByDesc('id')
         ->paginate(20);
@@ -182,11 +190,90 @@ class StockController extends Controller
         $item->load('category');
 
         $logs = $item->stockLogs()
-            ->with('user')
+            ->with([
+                'user',
+                'correctedLog',
+                'correctionLog',
+            ])
             ->orderByDesc('acted_at')
             ->orderByDesc('id')
             ->paginate(10);
-        
-            return view('items.logs',compact('item', 'logs'));
+
+            return view(
+                'items.logs',
+                compact('item', 'logs')
+            );
+    }
+
+    public function createCorrection(StockLog $stockLog)
+    {
+        $stockLog->load([
+            'item',
+            'user',
+            'correctionLog',
+        ]);
+
+        if ($stockLog->corrected_log_id !== null) {
+            return redirect()
+                ->route('items.logs', $stockLog->item_id)
+                ->with('error', '訂正記録をさらに訂正することはできません。');
+        }
+
+        if ($stockLog->correctionLog !== null) {
+            return redirect()
+                ->route('items.logs', $stockLog->item_id)
+                ->with('error', 'この履歴はすでに訂正されています。');
+        }
+
+        return view(
+            'stock_logs.correction',
+            compact('stockLog')
+        );
+    }
+
+    public function storeCorrection(
+        StockCorrectionRequest $request,
+        StockLog $stockLog
+    ) {
+        $validated = $request->validated();
+
+        DB::transaction(function () use (
+            $stockLog,
+            $validated
+        ) {
+            $originalLog = StockLog::query()
+                ->with('correctionLog')
+                ->lockForUpdate()
+                ->findOrFail($stockLog->id);
+
+            if ($originalLog->corrected_log_id !== null) {
+                abort(422, '訂正記録をさらに訂正することはできません。');
+            }
+
+            if ($originalLog->correctionLog !== null) {
+                abort(422, 'この履歴はすでに訂正されています。');
+            }
+
+            $correctionType =
+                $originalLog->type === 'in'
+                ? 'out'
+                : 'in';
+
+            StockLog::create([
+                'corrected_log_id' => $originalLog->id,
+                'item_id' => $originalLog->item_id,
+                'user_id' => auth()->id(),
+                'type' => $correctionType,
+                'qty' => $originalLog->qty,
+                'note' => null,
+                'correction_reason' =>
+                    $validated['correction_reason'],
+                'acted_at' => now(),
+            ]);
+        });
+
+        return redirect()
+        ->route('items.logs', $stockLog->item_id)
+        ->with('success', '入出庫履歴を訂正しました。');
     }
 }

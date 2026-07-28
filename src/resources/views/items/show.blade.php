@@ -14,28 +14,28 @@
         <tr>
             <th>カテゴリー</th>
             <td class="text-center">
-              {{ $item->category->name ?? '未設定' }}
+                {{ $item->category->name ?? '未設定' }}
             </td>
         </tr>
 
         <tr>
             <th>商品名</th>
             <td class="text-center">
-              {{ $item->name }}
+                {{ $item->name }}
             </td>
         </tr>
 
         <tr>
             <th>管理番号</th>
             <td class="text-center">
-              {{ $item->sku }}
+                {{ $item->sku }}
             </td>
         </tr>
 
         <tr>
             <th>単位</th>
             <td class="text-center">
-              {{ $item->unit }}
+                {{ $item->unit }}
             </td>
         </tr>
 

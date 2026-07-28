@@ -14,6 +14,8 @@ class StockLog extends Model
         'note',
         'acted_at',
         'user_id',
+        'corrected_log_id',
+        'correction_reason',
     ];
 
     protected $casts = [
@@ -29,5 +31,21 @@ class StockLog extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function correctedLog()
+    {
+        return $this->belongsTo(
+            StockLog::class,
+            'corrected_log_id'
+        );
+    }
+
+    public function correctionLog()
+    {
+        return $this->hasOne(
+            StockLog::class,
+            'corrected_log_id'
+        );
     }
 }
