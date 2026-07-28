@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ItemController;
 use App\Http\Controllers\StockController;
+use App\Http\Controllers\DashboardController;
 
 /*
 |--------------------------------------------------------------------------
@@ -15,7 +16,7 @@ use App\Http\Controllers\StockController;
 |
 */
 
-Route::get('/', fn () => redirect()->route('items.index'));
+Route::get('/', fn () => redirect()->route('dashboard'));
 
 Route::middleware(['auth'])->group(function () {
     // 商品管理
@@ -64,4 +65,10 @@ Route::middleware(['auth'])->group(function () {
         '/stock-logs/{stockLog}/correct',
         [StockController::class, 'storeCorrection']
     )->name('stock-logs.corrections.store');
+
+    // ダッシュボード
+    Route::get(
+        '/dashboard',
+        [DashboardController::class, 'index']
+    )->name('dashboard');
 });
