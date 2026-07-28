@@ -109,6 +109,21 @@
             @enderror
         </div>
 
+        <div>
+            <label class="text-area"  for="note">商品メモ</label>
+
+            <textarea
+                id="note"
+                name="note"
+                rows="4"
+            >{{ old('note') }}
+            </textarea>
+
+            @error('note')
+                <p>{{ $message }}</p>
+            @enderror
+        </div>
+
         <button type="submit">
             登録
         </button>

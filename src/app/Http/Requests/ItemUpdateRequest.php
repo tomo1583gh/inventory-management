@@ -31,6 +31,7 @@ class ItemUpdateRequest extends FormRequest
             'sku' => ['required', 'string', 'max:255', Rule::unique('items', 'sku')->ignore($itemId)],
             'unit' => ['required', 'string', 'max:50'],
             'minimum_stock' => ['required', 'integer', 'min:0'],
+            'note' => ['nullable', 'string', 'max:1000'],
         ];
     }
 }

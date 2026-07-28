@@ -145,6 +145,20 @@ class ItemController extends Controller
     {
         $item->load('category');
 
-        return view('items.show', compact('item'));
+        $currentQty  = $item->stockLogs()
+            ->selectRaw("
+                COALESCE(
+                    SUM(
+                        CASE
+                            WHEN type = 'in' THEN qty
+                            WHEN type = 'out' THEN -qty
+                        END
+                    ),
+                    0
+                ) as current_qty
+            ")
+            ->value('current_qty');
+
+        return view('items.show', compact('item','currentQty'));
     }
 }

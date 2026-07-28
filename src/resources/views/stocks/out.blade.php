@@ -65,7 +65,7 @@
         </div>
 
         <div>
-            <label for="note">メモ</label>
+            <label for="note">出庫メモ</label>
 
             <textarea
                 id="note"

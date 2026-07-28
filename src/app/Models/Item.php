@@ -15,6 +15,7 @@ class Item extends Model
         'sku', 
         'unit',
         'minimum_stock',
+        'note',
     ];
 
     public function category(): BelongsTo

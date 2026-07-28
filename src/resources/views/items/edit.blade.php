@@ -111,6 +111,21 @@
             @enderror
         </div>
 
+        <div>
+            <label for="note">商品メモ</label>
+
+            <textarea
+                id="note"
+                name="note"
+                rows="4"
+            >{{ old('note', $item->note) }}
+            </textarea>
+
+            @error('note')
+                <p>{{ $message }}</p>
+            @enderror
+        </div>
+
         <button type="submit">
             更新
         </button>

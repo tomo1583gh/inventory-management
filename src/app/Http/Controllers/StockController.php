@@ -173,4 +173,20 @@ class StockController extends Controller
 
         return view('stocks.logs', compact('logs'));
     }
+
+    /*
+    * 商品別入出庫履歴
+    */
+    public function itemLogs(Item $item)
+    {
+        $item->load('category');
+
+        $logs = $item->stockLogs()
+            ->with('user')
+            ->orderByDesc('acted_at')
+            ->orderByDesc('id')
+            ->paginate(10);
+        
+            return view('items.logs',compact('item', 'logs'));
+    }
 }

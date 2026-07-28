@@ -23,7 +23,7 @@
                     <th>数量</th>
                     <th>単位</th>
                     <th>担当者</th>
-                    <th>メモ</th>
+                    <th>入出庫メモ</th>
                 </tr>
             </thead>
 
