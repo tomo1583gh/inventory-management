@@ -100,6 +100,18 @@
 
     </form>
 
+    <p>
+        <a href="{{ route('items.export.csv', [
+            'q' => $q,
+            'sku' => $sku,
+            'category_id' => $categoryId,
+            'sort' => $sort,
+            'direction' => $direction,
+        ]) }}">
+            商品一覧CSV出力
+        </a>
+    </p>
+
     @if ($items->isEmpty())
         <p>商品が登録されていません。</p>
     @else

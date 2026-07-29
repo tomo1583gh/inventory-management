@@ -17,3 +17,5 @@ App\Models\StockLog::count();
 exit
 App\Models\Item::where('sku', 'TEST-001')->first()->minimum_stock;
 exit
+now()
+exit

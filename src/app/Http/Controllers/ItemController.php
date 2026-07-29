@@ -82,6 +82,110 @@ class ItemController extends Controller
             ));
     }
 
+    /*
+    * 商品一覧CSV出力
+    */
+    public function exportCsv(Request $request)
+    {
+        $q = $request->input('q');
+        $sku = $request-> input('sku');
+        $categoryId = $request->input('category_id');
+
+        $sort = $request->input('sort', 'create_at');
+        $direction = $request->input('direction', 'desc');
+
+        $allowedSorts = [
+            'name',
+            'category',
+            'create_at',
+        ];
+
+        $allowedDirections = [
+            'asc',
+            'desc',
+        ];
+
+        if (!in_array($direction, $allowedSorts,true)) {
+            $sort = 'created_at';
+        }
+
+        if (!in_array($direction, $allowedDirections,true)) {
+            $direction = 'desc';
+        }
+
+        $items = Item::with('category')
+            ->when($q, function ($query, $q) {
+                $query->where('items.name', 'like', "%{$q}%");
+            })
+            ->when($sku, function ($query,$sku) {
+                $query->where('items.sku', 'like', "%{$sku}%");
+            })
+            ->when($categoryId, function ($query, $categoryId) {
+                $query->where('items.category_id', $categoryId);
+            });
+
+        if ($sort === 'category') {
+            $items->leftJoin(
+                'categories',
+                'items.category_id',
+                '=',
+                'categories.id'
+            )
+            ->select('items.*')
+            ->orderBy('categories.name', $direction);
+        } else {
+            $items->orderBy("items.{$sort}", $direction);
+        }
+
+        $items = $items->get();
+
+        $fileName = 'items_' . now()->format('Ymd_His') . 'csv';
+
+        return response()->streamDownload(
+            function () use ($items) {
+                $handle = fopen('php://output', 'w');
+
+                /*
+                * Excelで日本語が文字化けしないようにBOMを付ける
+                */
+                fwrite($handle, "\xEF\xBB\xBF");
+
+                /*
+                * CSVの見出し
+                */
+                fputcsv($handle, [
+                    'カテゴリー',
+                    '商品名',
+                    '管理番号',
+                    '単位',
+                    '最低在庫数',
+                    '商品メモ',
+                    '登録日時',
+                    '更新日時',
+                ]);
+
+                foreach ($items as $item) {
+                    fputcsv($handle, [
+                        $item->category->name ?? '未設定',
+                        $item->name,
+                        $item->sku,
+                        $item->unit,
+                        $item->minimum_stock,
+                        $item->note ?? '',
+                        $item->created_at?->format('Y/m/d H:i'),
+                        $item->updated_at?->format('Y/m/d H:i'),
+                    ]);
+                }
+
+                fclose($handle);
+            },
+            $fileName,
+            [
+                'Content-Type' => 'text/csv; charset=UTF-8',
+            ]
+        );
+    }
+
     /**
      * 商品登録画面を表示
      */
