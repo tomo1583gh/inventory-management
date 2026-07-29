@@ -10,6 +10,15 @@
 
 <h2>在庫一覧</h2>
 
+<p>
+    <a href="{{ route('stocks.export.csv', [
+    'sort' => $sort,
+    'direction' => $direction,
+    ]) }}">
+        在庫一覧をCSV出力
+    </a>
+<p>
+
 <table border="1" cellpadding="5">
 
     <tr>

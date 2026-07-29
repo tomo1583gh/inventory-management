@@ -163,6 +163,150 @@ class StockController extends Controller
         );
     }
 
+    /*
+    * 在庫一覧csv出力
+    */
+    public function exportCsv(Request $request)
+    {
+        $sort = $request->input('sort', 'name');
+        $direction = $request->input('direction', 'asc');
+
+        $allowedSorts = [
+            'name',
+            'stock',
+        ];
+
+        $allowedDirections = [
+            'asc',
+            'desc',
+        ];
+
+        /*
+        * 許可されていない並び替え項目の場合は商品名順に戻す
+        */
+        if (!in_array($sort, $allowedSorts, true)) {
+            $sort = 'name';
+        }
+
+        /*
+        * asc,desc以外の場合は昇順に戻す
+        */
+        if (!in_array($direction, $allowedDirections, true)) {
+            $direction = 'asc';
+        }
+
+        $stocks = Item::query()
+            ->leftJoin(
+                'categories',
+                'items.category_id',
+                '=',
+                'categories.id'
+            )
+            ->leftJoin(
+                'stock_logs',
+                'items.id',
+                '=',
+                'stock_logs.item_id'
+            )
+            ->select(
+                'items.id',
+                'items.name',
+                'items.sku',
+                'items.unit',
+                'items.minimum_stock',
+                'categories.name as category_name'
+            )
+            ->selectRaw("
+                COALESCE(
+                    SUM(
+                        CASE
+                            WHEN stock_logs.type = 'in'
+                            THEN stock_logs.qty
+                            
+                            WHEN stock_logs.type = 'out'
+                            THEN -stock_logs.qty
+                            
+                            ELSE 0
+                        END
+                    ),
+                    0
+                ) as current_qty
+            ")
+            ->groupBy(
+                'items.id',
+                'items.name',
+                'items.sku',
+                'items.unit',
+                'items.minimum_stock',
+                'categories.name'
+            )
+            ->when(
+                $sort === 'stock',
+                function ($query) use ($direction) {
+                    $query->orderBy('current_qty', $direction);
+                },
+                function ($query) use ($direction) {
+                    $query->orderBy('items.name', $direction);
+                }
+            )
+            ->get();
+
+        $fileName = 'stocks_' . now()->format('Ymd_His') . '.csv';
+
+        return response()->streamDownload(
+            function () use ($stocks) {
+                $handle = fopen('php://output', 'w');
+
+                /*
+                * Excelで日本語が文字化けしないようにBOMを付ける
+                */
+                fwrite($handle, "\xEF\xBB\xBF");
+
+                /*
+                * CSVの見出し
+                */
+                fputcsv($handle, [
+                    'カテゴリー',
+                    '商品名',
+                    '管理番号',
+                    '現在庫',
+                    '単位',
+                    '最低在庫',
+                    '在庫状況',
+                ]);
+
+                foreach ($stocks as $stock) {
+                    if ($stock->current_qty <= 0) {
+                        $status = '在庫切れ';
+                    } elseif (
+                        $stock->minimum_stock > 0
+                        && $stock-> current_qty <= $stock->minimum_stock
+                    ) {
+                        $status = '在庫不足';
+                    } else {
+                        $status = '在庫あり';
+                    }
+
+                    fputcsv($handle, [
+                        $stock->category_name ?? '未設定',
+                        $stock->name,
+                        $stock->sku,
+                        $stock->current_qty,
+                        $stock->unit,
+                        $stock->minimum_stock,
+                        $status,
+                    ]);
+                }
+
+                fclose($handle);
+            },
+            $fileName,
+            [
+                'Content-Type' => 'text/csv; charset=UTF-8',
+            ]
+        );
+    }
+
     /**
      * 入出庫履歴
      */

@@ -26,6 +26,10 @@ Route::middleware(['auth'])->group(function () {
     // 在庫管理
     Route::get('/stocks', [StockController::class, 'index'])
         ->name('stocks.index');
+
+    // 在庫一覧csv出力
+    Route::get('/stocks/export/csv', [StockController::class, 'exportCsv'])
+        ->name('stocks.export.csv');
     
     // 入庫
     Route::get('/stocks/in', [StockController::class, 'createIn'])
