@@ -10,6 +10,7 @@ class DashboardController extends Controller
     public function index()
     {
         $items = Item::query()
+            ->with('category')
             ->leftJoin(
                 'stock_logs',
                 'items.id',
@@ -19,7 +20,10 @@ class DashboardController extends Controller
             ->select(
                 'items.id',
                 'items.name',
-                'items.minimum_stock'
+                'items.sku',
+                'items.unit',
+                'items.minimum_stock',
+                'items.category_id'
             )
             ->selectRaw("
                 COALESCE(
@@ -40,7 +44,10 @@ class DashboardController extends Controller
             ->groupBy(
                 'items.id',
                 'items.name',
-                'items.minimum_stock'
+                'items.sku',
+                'items.unit',
+                'items.minimum_stock',
+                'items.category_id'
             )
             ->get();
 
@@ -50,26 +57,32 @@ class DashboardController extends Controller
         $itemCount = $items->count();
 
         /*
-        * 在庫切れ商品数
+        * 在庫切れ商品
         * 現在在庫数が0以下の商品
         */
-        $outOfStockCount = $items
+        $outOfStockItems = $items
             ->filter(function ($item) {
                 return $item->current_qty <= 0;
             })
-            ->count();
+            ->values();
         
             /*
-            * 在庫不足商品数
+            * 在庫不足商品
             * 在庫は残っているが、最低在庫数以下の商品
             */
-            $lowStockCount = $items
+            $lowStockItems = $items
                 ->filter(function ($item) {
-                    return $item->minimum_stock > 0
-                    && $item->current_qty > 0
+                    return $item->current_qty > 0
+                    && $item->minimum_stock > 0
                     && $item->current_qty <= $item->minimum_stock;
                 })
-                ->count();
+                ->values();
+
+            /*
+            * 件数
+            */
+                $outOfStockCount = $outOfStockItems->count();
+                $lowStockCount = $lowStockItems->count();
 
             $recentLogs = StockLog::query()
                 ->with([
@@ -83,16 +96,22 @@ class DashboardController extends Controller
                 ->limit(5)
                 ->get();
 
+            $recentItems = Item::query()
+                ->with('category')
+                ->orderByDesc('created_at')
+                ->limit(5)
+                ->get();
+
             // ここでビューへ戻す
 
-            return view(
-                'dashboard', 
-                compact(
-                    'items', 
-                    'recentLogs',
-                    'itemCount',
-                    'outOfStockCount',
-                    'lowStockCount',
+            return view('dashboard', compact(
+                'itemCount', 
+                'outOfStockCount',
+                'lowStockCount',
+                'outOfStockItems',
+                'lowStockItems',
+                'recentItems',
+                'recentLogs'
                 )
             );
     }

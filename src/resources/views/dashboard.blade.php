@@ -28,6 +28,186 @@
 <hr>
 
 <div>
+    <h3>在庫切れ商品</h3>
+
+    <table border="1" cellpadding="5">
+        <thead>
+            <tr>
+                <th>カテゴリー</th>
+                <th>商品名</th>
+                <th>管理番号</th>
+                <th>現在庫</th>
+                <th>単位</th>
+                <th>最低在庫数</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @forelse ($outOfStockItems as $item)
+                <tr>
+                    <td class="text-center">
+                        {{ $item->category->name ?? '-' }}
+                    </td>
+
+                    <td>
+                        <a href="{{ route('items.show', $item->id) }}">
+                            {{ $item->name }}
+                        </a>
+                    </td>
+
+                    <td class="text-center">
+                        {{ $item->sku }}
+                    </td>
+
+                    <td class="text-right">
+                        @if (floor($item->current_qty) == $item->current_qty)
+                            {{ number_format($item->current_qty, 0) }}
+                        @else
+                            {{ number_format($item->current_qty, 2) }}
+                        @endif
+                    </td>
+
+                    <td class="text-center">
+                        {{ $item->unit }}
+                    </td>
+
+                    <td class="text-right">
+                        @if (floor($item->minimum_stock) == $item->minimum_stock)
+                            {{ number_format($item->minimum_stock, 0) }}
+                        @else
+                            {{ number_format($item->minimum_stock, 2) }}
+                        @endif
+                    </td>
+                </tr>
+            @empty
+                <tr>
+                    <td colspan="6" class="text-center">
+                        在庫切れの商品はありません。
+                    </td>
+                </tr>
+            @endforelse
+        </tbody>
+    </table>
+</div>
+
+<hr>
+
+<div>
+    <h3>在庫不足商品</h3>
+
+    <table border="1" cellpadding="5">
+        <thead>
+            <tr>
+                <th>カテゴリー</th>
+                <th>商品名</th>
+                <th>管理番号</th>
+                <th>現在庫</th>
+                <th>単位</th>
+                <th>最低在庫数</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @forelse ($lowStockItems as $item)
+                <tr>
+                    <td class="text-center">
+                        {{ $item->category->name ?? '-' }}
+                    </td>
+
+                    <td>
+                        <a href="{{ route('items.show', $item->id) }}">
+                            {{ $item->name }}
+                        </a>
+                    </td>
+
+                    <td class="text-center">
+                        {{ $item->sku }}
+                    </td>
+
+                    <td class="text-right">
+                        @if (floor($item->current_qty) == $item->current_qty)
+                            {{ number_format($item->current_qty, 0) }}
+                        @else
+                            {{ number_format($item->current_qty, 2) }}
+                        @endif
+                    </td>
+
+                    <td class="text-center">
+                        {{ $item->unit }}
+                    </td>
+
+                    <td class="text-right">
+                        @if (floor($item->minimum_stock) == $item->minimum_stock)
+                            {{ number_format($item->minimum_stock, 0) }}
+                        @else
+                            {{ number_format($item->minimum_stock, 2) }}
+                        @endif
+                    </td>
+                </tr>
+            @empty
+                <tr>
+                    <td colspan="6" class="text-center">
+                        在庫不足の商品はありません。
+                    </td>
+                </tr>
+            @endforelse
+        </tbody>
+    </table>
+</div>
+
+<hr>
+
+<div>
+    <h3>最近登録された商品</h3>
+
+    <table border="1" cellpadding="5">
+        <thead>
+            <tr>
+                <th>登録日時</th>
+                <th>カテゴリー</th>
+                <th>商品名</th>
+                <th>管理番号</th>
+                <th>単位</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @forelse ($recentItems as $item)
+                <tr>
+                    <td class="text-center">
+                        {{ $item->created_at->format('y/m/d H:i') }}
+                    </td>
+
+                    <td class="text-center">
+                        {{ $item->category_name ?? '-' }}
+                    </td>
+
+                    <td>
+                        <a href="{{ route('items.show',$item) }}">
+                            {{ $item->name }}
+                        </a>
+                    </td>
+
+                    <td class="text-center">
+                        {{ $item->sku }}
+                    </td>
+
+                    <td class="text-center">
+                        {{ $item->unit }}
+                    </td>
+                </tr>
+            @empty
+                <tr>
+                    <td colspan="5" class="text-center">
+                        登録された商品はありません。
+                    </td>
+                </tr>
+            @endforelse
+        </tbody>
+    </table>
+</div>
+
+<div>
     <h3>最近の入出庫履歴</h3>
 
     <table border="1" cellpadding="5">

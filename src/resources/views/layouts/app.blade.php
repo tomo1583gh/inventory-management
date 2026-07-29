@@ -12,12 +12,17 @@
 
 <body>
 
-    <h1>在庫管理システム</h1>
+    <h1>
+    <a href="{{ route('dashboard') }}">
+        農業在庫管理システム
+    </a>
+</h1>
 
     <hr>
 
     @auth
         <nav>
+            <a href="{{ route('dashboard') }}">ダッシュボード</a> |
             <a href="{{ route('items.index') }}">商品一覧</a> |
             <a href="{{ route('stocks.index') }}">在庫一覧</a> |
             <a href="{{ route('stocks.in.create') }}">入庫登録</a> |
