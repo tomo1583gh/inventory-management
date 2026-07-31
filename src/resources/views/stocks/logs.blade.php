@@ -7,6 +7,12 @@
 
     <h2>入出庫履歴</h2>
 
+    <p>
+        <a href="{{ route('stocks.logs.export.csv') }}">
+            入出庫履歴をCSV出力
+        </a>
+    </p>
+
     @if (session('success'))
         <p>{{ session('success') }}</p>
     @endif

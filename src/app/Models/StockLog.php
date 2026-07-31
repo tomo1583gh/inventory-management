@@ -20,7 +20,7 @@ class StockLog extends Model
 
     protected $casts = [
         'qty' => 'decimal:2',
-        'acted_at' => 'date',
+        'acted_at' => 'datetime',
     ];
 
     public function item(): BelongsTo

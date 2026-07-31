@@ -312,8 +312,7 @@ class StockController extends Controller
      */
     public function logs()
     {
-        $logs = StockLog::with(['item', 'user'])
-        ->with([
+        $logs = StockLog::with([
             'item.category',
             'user',
             'correctedLog',
@@ -324,6 +323,82 @@ class StockController extends Controller
         ->paginate(20);
 
         return view('stocks.logs', compact('logs'));
+    }
+
+    /*
+    * 入出庫履歴CSV出力
+    */
+    public function exportLogsCsv()
+    {
+        $logs = StockLog::with([
+            'item.category',
+            'user',
+            'correctedLog',
+            'correctionLog',
+        ])
+            ->orderByDesc('acted_at')
+            ->orderByDesc('id')
+            ->get();
+
+        $fileName = 'stock_logs_' . now()->format('Ymd_His') . '.csv';
+
+        return response()->streamDownload(
+            function () use ($logs) {
+                $handle = fopen('php://output', 'w');
+
+                // Excelで日本語が文字化けしにくいようにBOMを付ける
+                fwrite($handle, "\xEF\xBB\xBF");
+
+                fputcsv($handle,[
+                    '日時',
+                    'カテゴリー',
+                    '商品名',
+                    '管理番号',
+                    '区分',
+                    '数量',
+                    '単位',
+                    '担当者',
+                    'メモ・訂正理由',
+                    '状態',
+                ]);
+
+                foreach ($logs as $log) {
+                    if ($log->corrected_log_id !== null) {
+                        $status = '訂正記録';
+                    } elseif ($log->correctionLog !== null) {
+                        $status = '訂正済み';
+                    } else {
+                        $status = '通常';
+                    }
+
+                    if ($log->corrected_log_id !== null) {
+                        $memo = '訂正理由:'
+                            . ($log->correction_reason ?: '理由の記録なし');
+                    } else {
+                        $memo = $log->note ?? '';
+                    }
+
+                    fputcsv($handle, [
+                        $log->acted_at->format('Y/m/d H:i'),
+                        $log->item?->category?->name ?? '未設定',
+                        $log->item?->name ?? '商品情報なし',
+                        $log->item?->sku ?? '',
+                        $log->type === 'in' ? '入庫' : '出庫',
+                        $log->qty,
+                        $log->item?->unit ?? '',
+                        $log->user?->name ?? '不明',
+                        $memo,
+                        $status,
+                    ]);
+                }
+
+                fclose($handle);
+            },
+            $fileName,
+            [
+                'Content-Type' => 'text/csv; charset=UTF-8',
+            ]
+        );
     }
 
     /*

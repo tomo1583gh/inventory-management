@@ -49,6 +49,10 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/stocks/out', [StockController::class,'storeOut'])
         ->name('stocks.out.store');
 
+    // 入出庫履歴CSV出力
+    Route::get('/stocks/logs/export/csv', [StockController::class, 'exportLogsCsv'])
+        ->name('stocks.logs.export.csv');
+
     // 入出庫履歴
     Route::get('/stocks/logs', [StockController::class, 'logs'])
         ->name('stocks.logs');
