@@ -265,4 +265,12 @@ class ItemController extends Controller
 
         return view('items.show', compact('item','currentQty'));
     }
+
+    /*
+    * 商品インポート画面
+    */
+    public function createImport()
+    {
+        return view('items.import');
+    }
 }

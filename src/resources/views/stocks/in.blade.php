@@ -28,7 +28,7 @@
             </select>
 
             @error('item_id')
-                <p>{{ $message }}</p>
+                <p class="error">{{ $message }}</p>
             @enderror
         </div>
 
@@ -45,7 +45,7 @@
             >
 
             @error('qty')
-                <p>{{ $message }}</p>
+                <p class="error">{{ $message }}</p>
             @enderror
         </div>
 
@@ -60,7 +60,7 @@
             >
 
             @error('acted_at')
-                <p>{{ $message }}</p>
+                <p class="error">{{ $message }}</p>
             @enderror
         </div>
 
@@ -73,7 +73,7 @@
             >{{ old('note') }}</textarea>
 
             @error('note')
-                <p>{{ $message }}</p>
+                <p class="error">{{ $message }}</p>
             @enderror
         </div>
 

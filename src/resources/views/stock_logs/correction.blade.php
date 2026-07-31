@@ -83,11 +83,10 @@
             id="correction_reason"
             name="correction_reason"
             rows="4"
-            required
         >{{ old('correction_reason') }}</textarea>
 
         @error('correction_reason')
-            <p>{{ $message }}</p>
+            <p class="error">{{ $message }}</p>
         @enderror
     </div>
 

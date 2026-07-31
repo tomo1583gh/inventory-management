@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class StockCorrectionRequest extends FormRequest
+class ItemImportRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,10 +22,11 @@ class StockCorrectionRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'correction_reason' => [
+            'csv_file' => [
                 'required',
-                'string',
-                'max:1000',
+                'file',
+                'mimes:csv,txt',
+                'max:2048',
             ],
         ];
     }
@@ -33,16 +34,10 @@ class StockCorrectionRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'correction_reason.required' => '訂正理由を入力してください。',
-            'correction_reason.string' => '訂正理由を正しく入力してください。',
-            'correction_reason.max' => '訂正理由は1000文字以内で入力してください。',
-        ];
-    }
-
-    public function attributes(): array
-    {
-        return [
-            'correction_reason' => '訂正理由',
+            'csv_file.required' => 'CSVファイルを選択してください。',
+            'csv_file.file' => 'ファイルを選択してください。',
+            'csv_file.mimes' => 'CSVファイルを選択してください。',
+            'csv_file.max' => 'CSVファイルは2MB以下にしてください。',
         ];
     }
 }

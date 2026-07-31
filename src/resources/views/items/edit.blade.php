@@ -7,14 +7,6 @@
 
     <h2>商品編集</h2>
 
-    @if ($errors->any())
-        <ul>
-            @foreach ($errors->all() as $error)
-                <li>{{ $error }}</li>
-            @endforeach
-        </ul>
-    @endif
-
     <form 
         action="{{ route('items.update', $item) }}"
         method="POST"
@@ -45,7 +37,7 @@
             </select>
 
             @error('category_id')
-                <p>{{ $message }}</p>
+                <p class="error">{{ $message }}</p>
             @enderror
         </div>
 
@@ -60,7 +52,7 @@
             >
 
             @error('name')
-                <p>{{ $message }}</p>
+                <p class="error">{{ $message }}</p>
             @enderror
         </div>
 
@@ -75,7 +67,7 @@
             >
 
             @error('sku')
-                <p>{{ $message }}</p>
+                <p class="error">{{ $message }}</p>
             @enderror
         </div>
 
@@ -90,7 +82,7 @@
             >
 
             @error('unit')
-                <p>{{ $message }}</p>
+                <p class="error">{{ $message }}</p>
             @enderror
             
         </div>
@@ -107,7 +99,7 @@
             >
 
             @error('minimum_stock')
-                <P>{{ $message }}</P>
+                <P class="error">{{ $message }}</P>
             @enderror
         </div>
 
@@ -122,7 +114,7 @@
             </textarea>
 
             @error('note')
-                <p>{{ $message }}</p>
+                <p class="error">{{ $message }}</p>
             @enderror
         </div>
 
