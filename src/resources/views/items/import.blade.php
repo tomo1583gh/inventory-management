@@ -16,10 +16,14 @@
     </div>
 @endif
 
+<p>
+    エラーが表示された場合は、修正したCSVファイルをもう一度選択してください。
+</p>
+
 <form
     action="{{ route('items.import.store') }}"
     method="POST"
-    enctype="multipart/form-date"
+    enctype="multipart/form-data"
 >
     @csrf
 
@@ -31,7 +35,6 @@
             name="csv_file"
             id="file"
             accept=".csv,text/csv"
-            required
         >
     </div>
 

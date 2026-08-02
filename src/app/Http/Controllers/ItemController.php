@@ -7,6 +7,8 @@ use App\Http\Requests\ItemUpdateRequest;
 use App\Models\Item;
 use Illuminate\Http\Request;
 use App\Models\Category;
+use App\Http\Requests\ItemImportRequest;
+use Illuminate\Support\Facades\DB;
 
 class ItemController extends Controller
 {
@@ -45,7 +47,7 @@ class ItemController extends Controller
             ->when($q, function ($query, $q) {
                 $query->where('items.name', 'like', "%{$q}%");
             })
-            ->when($sku,function ($query, $sku) {
+            ->when($sku, function ($query, $sku) {
                 $query->where('items.sku', 'like', "%{$sku}%");
             })
             ->when($categoryId, function ($query, $categoryId) {
@@ -59,8 +61,8 @@ class ItemController extends Controller
                 '=',
                 'categories.id'
             )
-            ->select('items.*')
-            ->orderBy('categories.name', $direction);
+                ->select('items.*')
+                ->orderBy('categories.name', $direction);
         } else {
             $items->orderBy("items.{$sort}", $direction);
         }
@@ -71,15 +73,15 @@ class ItemController extends Controller
 
         $categories = Category::orderBy('name')->get();
 
-            return view('items.index',compact(
-                    'items', 
-                    'q',
-                    'sku',
-                    'categoryId',
-                    'categories',
-                    'sort',
-                    'direction'
-            ));
+        return view('items.index', compact(
+            'items',
+            'q',
+            'sku',
+            'categoryId',
+            'categories',
+            'sort',
+            'direction'
+        ));
     }
 
     /*
@@ -88,7 +90,7 @@ class ItemController extends Controller
     public function exportCsv(Request $request)
     {
         $q = $request->input('q');
-        $sku = $request-> input('sku');
+        $sku = $request->input('sku');
         $categoryId = $request->input('category_id');
 
         $sort = $request->input('sort', 'create_at');
@@ -105,11 +107,11 @@ class ItemController extends Controller
             'desc',
         ];
 
-        if (!in_array($direction, $allowedSorts,true)) {
+        if (!in_array($direction, $allowedSorts, true)) {
             $sort = 'created_at';
         }
 
-        if (!in_array($direction, $allowedDirections,true)) {
+        if (!in_array($direction, $allowedDirections, true)) {
             $direction = 'desc';
         }
 
@@ -117,7 +119,7 @@ class ItemController extends Controller
             ->when($q, function ($query, $q) {
                 $query->where('items.name', 'like', "%{$q}%");
             })
-            ->when($sku, function ($query,$sku) {
+            ->when($sku, function ($query, $sku) {
                 $query->where('items.sku', 'like', "%{$sku}%");
             })
             ->when($categoryId, function ($query, $categoryId) {
@@ -131,8 +133,8 @@ class ItemController extends Controller
                 '=',
                 'categories.id'
             )
-            ->select('items.*')
-            ->orderBy('categories.name', $direction);
+                ->select('items.*')
+                ->orderBy('categories.name', $direction);
         } else {
             $items->orderBy("items.{$sort}", $direction);
         }
@@ -263,7 +265,7 @@ class ItemController extends Controller
             ")
             ->value('current_qty');
 
-        return view('items.show', compact('item','currentQty'));
+        return view('items.show', compact('item', 'currentQty'));
     }
 
     /*
@@ -272,5 +274,204 @@ class ItemController extends Controller
     public function createImport()
     {
         return view('items.import');
+    }
+
+    /*
+    * 商品CSVインポート
+    */
+    public function importCsv(ItemImportRequest $request)
+    {
+        $file = $request->file('csv_file');
+
+        $handle = fopen($file->getRealPath(), 'r');
+
+        if ($handle === false) {
+            return back()
+                ->withErrors([
+                    'csv_file' => 'CSVファイルを読み込めませんでした。',
+                ]);
+        }
+
+        // 1行目を読み込む
+        $header = fgetcsv($handle);
+
+        if ($header === false) {
+            fclose($handle);
+
+            return back()
+                ->withErrors([
+                    'csv_file' => 'CSVファイルにヘッダー行がありません。',
+                ]);
+        }
+
+        $header[0] = preg_replace(
+            '/^\xEF\xBB\xBF/',
+            '',
+            $header[0]
+        );
+
+        $header = array_map('trim', $header);
+
+        $expectedHeader = [
+            'カテゴリー',
+            '商品名',
+            '管理番号',
+            '単位',
+            '最低在庫数',
+            '商品メモ',
+        ];
+
+        if ($header !== $expectedHeader) {
+            fclose($handle);
+
+            return back()
+                ->withErrors([
+                    'csv_file' => 'CSVのヘッダーまたは列の順番が正しくありません。',
+                ]);
+        }
+
+        $rows = [];
+
+        // 2行目以降を商品データとして読み込む
+        $lineNumber = 1;
+        while (($row = fgetcsv($handle)) !== false) {
+            $lineNumber++;
+
+            $isEmptyRow = count(array_filter(
+                $row,
+                fn ($value) => trim((string) $value) !== ''
+            )) === 0;
+
+            if ($isEmptyRow) {
+                continue;
+            }
+
+            $rows[] = [
+                'line_number' => $lineNumber,
+                'data' => $row,
+            ];
+        }
+
+        fclose($handle);
+        
+        try {
+            DB::transaction(function () use ($rows) {
+                foreach ($rows as $rowData) {
+                    $lineNumber = $rowData['line_number'];
+                    $row = $rowData['data'];
+
+                    if (count($row) !== 6) {
+                        throw new \RuntimeException(
+                            "{$lineNumber}行目の列数が正しくありません。6列で入力してください。"
+                        );
+                    }
+
+                    [
+                        $categoryName,
+                        $name,
+                        $sku,
+                        $unit,
+                        $minimumStock,
+                        $note,
+                    ] = $row;
+
+                    if (
+                        filter_var($minimumStock, FILTER_VALIDATE_INT) === false
+                    ) {
+                        throw new \RuntimeException(
+                            "{$lineNumber}行目：最低在庫数は整数で入力してください。"
+                        );
+                    }
+
+                    if ((int) $minimumStock < 0) {
+                        throw new \RuntimeException(
+                            "{$lineNumber}行目：最低在庫数は０以上で入力してください。"
+                        );
+                    }
+
+                    if (trim($categoryName) === '') {
+                        throw new \RuntimeException(
+                            "{$lineNumber}行目：カテゴリーを入力してください。"
+                        );
+                    }
+
+                    if (trim($name) === '') {
+                        throw new \RuntimeException(
+                            "{$lineNumber}行目：商品名を入力してください。"
+                        );
+                    }
+
+                    if (trim($sku) === '') {
+                        throw new \RuntimeException(
+                            "{$lineNumber}行目：管理番号を入力してください。"
+                        );
+                    }
+
+                    if (trim($unit) === '') {
+                        throw new \RuntimeException(
+                            "{$lineNumber}行目：単位を入力してください。"
+                        );
+                    }
+
+                    if (trim($minimumStock) === '') {
+                        throw new \RuntimeException(
+                            "{$lineNumber}行目：最低在庫数を入力してください。"
+                        );
+                    }
+
+                    if (mb_strlen(trim($name)) > 255) {
+                        throw new \RuntimeException(
+                            "{$lineNumber}行目：商品名は255文字以内で入力してください。"
+                        );
+                    }
+                    
+                    if (mb_strlen(trim($sku)) > 255) {
+                        throw new \RuntimeException(
+                            "{$lineNumber}行目：管理番号は255文字以内で入力してください。"
+                        );
+                    }
+
+                    if (mb_strlen(trim($unit)) > 50) {
+                        throw new \RuntimeException(
+                            "{$lineNumber}行目：単位は50文字以内で入力してください。"
+                        );
+                    }
+
+                    if (mb_strlen(trim($note)) > 1000) {
+                        throw new \RuntimeException(
+                            "{$lineNumber}行目：商品メモは1000文字以内で入力してください。"
+                        );
+                    }
+
+                    $category = Category::firstOrCreate(
+                        [
+                            'name' => $categoryName,
+                        ]
+                    );
+
+                    Item::updateOrCreate(
+                        [
+                            'sku' => $sku,
+                        ],
+                        [
+                            'category_id' => $category->id,
+                            'name' => $name,
+                            'unit' => $unit,
+                            'minimum_stock' => $minimumStock,
+                            'note' => $note !== '' ? $note : null,
+                        ]
+                    );
+                }
+            }); 
+        } catch (\RuntimeException $e) {
+            return back()
+                ->withErrors([
+                    'csv_file' => $e->getMessage(),
+                ]);
+        }
+
+        return redirect()
+            ->route('items.index')
+            ->with('success', '商品ＣＳＶをインポートしました。');
     }
 }

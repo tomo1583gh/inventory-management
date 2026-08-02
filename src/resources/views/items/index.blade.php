@@ -23,10 +23,6 @@
         </button>
     </form>
 
-    @if (session('success'))
-        <p>{{ session('success') }}</p>
-    @endif
-
     <a href="{{ route('items.create') }}">
         商品を登録する
     </a>
