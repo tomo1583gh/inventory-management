@@ -93,13 +93,13 @@ class ItemController extends Controller
         $sku = $request->input('sku');
         $categoryId = $request->input('category_id');
 
-        $sort = $request->input('sort', 'create_at');
+        $sort = $request->input('sort', 'created_at');
         $direction = $request->input('direction', 'desc');
 
         $allowedSorts = [
             'name',
             'category',
-            'create_at',
+            'created_at',
         ];
 
         $allowedDirections = [
@@ -107,7 +107,7 @@ class ItemController extends Controller
             'desc',
         ];
 
-        if (!in_array($direction, $allowedSorts, true)) {
+        if (!in_array($sort, $allowedSorts, true)) {
             $sort = 'created_at';
         }
 
@@ -141,7 +141,7 @@ class ItemController extends Controller
 
         $items = $items->get();
 
-        $fileName = 'items_' . now()->format('Ymd_His') . 'csv';
+        $fileName = 'items_' . now()->format('Ymd_His') . '.csv';
 
         return response()->streamDownload(
             function () use ($items) {
