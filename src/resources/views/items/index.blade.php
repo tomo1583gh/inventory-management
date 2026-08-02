@@ -1,5 +1,9 @@
 @extends('layouts.app')
 
+@section('css')
+    <link rel="stylesheet" href="{{ asset('css/items.css') }}">
+@endsection
+
 @section('title', '商品一覧')
 
 @section('content')
@@ -23,9 +27,26 @@
         </button>
     </form>
 
-    <a href="{{ route('items.create') }}">
-        商品を登録する
-    </a>
+    <div class="item-actions">
+        <a href="{{ route('items.create') }}">
+            商品を登録する
+        </a>
+
+        <a href="{{ route('items.import.create')}}">
+            商品CSVインポート
+        </a>
+
+        <a href="{{ route('items.export.csv', [
+            'q' => $q,
+            'sku' => $sku,
+            'category_id' => $categoryId,
+            'sort' => $sort,
+            'direction' => $direction,
+        ]) }}">
+            商品一覧CSV出力
+        </a>
+    </div>
+
 
     <form action="{{ route('items.index') }}" method="GET"> 
         

@@ -23,6 +23,10 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/items/export/csv', [ItemController::class, 'exportCsv'])
         ->name('items.export.csv');
 
+    // 商品CSVインポート用テンプレート
+    Route::get('/items/import/template', [ItemController::class, 'downLoadTemplate'])
+        ->name('items.import.template');
+
     // 商品CSVインポート画面
     Route::get('items/import',[ItemController::class, 'createImport'])
         ->name('items.import.create');

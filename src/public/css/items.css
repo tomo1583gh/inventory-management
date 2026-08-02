@@ -36,3 +36,15 @@
   background-color: #d4edda;
   border: 1px solid #c3e6cb;
 }
+
+.help-text {
+    color: #666;
+  font-size: 0.8rem;
+    margin-top: 4px;
+}
+
+.item-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}

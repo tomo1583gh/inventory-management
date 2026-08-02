@@ -1,23 +1,33 @@
 @extends('layouts.app')
 
+@section('css')
+    <link rel="stylesheet" href="{{ asset('css/items.css') }}">
+@endsection
+
 @section('title', '商品CSVインポート')
 
 @section('content')
 
 <h2>商品インポート</h2>
 
-@if ($errors->any())
-    <div>
-        <ul>
-            @foreach ($errors->all() as $error)
-                <li>{{ $error }}</li>
-            @endforeach
-        </ul>
-    </div>
-@endif
+<p>
+    <a href="{{ route('items.import.template') }}">
+        CSVテンプレートをダウンロード
+    </a>
+</p>
+
+<p class="help-text">
+    ※　テンプレートには入力例が1列含まれています。
+    不要な場合は削除してから使用してください。
+</p>
 
 <p>
-    エラーが表示された場合は、修正したCSVファイルをもう一度選択してください。
+    CSVの列順：
+    カテゴリー、商品名、管理番号、単位、最低在庫数、商品メモ
+</p>
+
+<p class="help-text">
+    ※　エラーが表示された場合は、修正したCSVファイルをもう一度選択してください。
 </p>
 
 <form
@@ -36,17 +46,22 @@
             id="file"
             accept=".csv,text/csv"
         >
+
+        @if ($errors->any())
+            <div>
+                <ul>
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
     </div>
 
     <button type="submit">
         インポート
     </button>
 </form>
-
-<p>
-    CSVの列順：
-    カテゴリー、商品名、管理番号、単位、最低在庫数、商品メモ
-</p>
 
 <p>
     <a href="{{ route('items.index') }}">

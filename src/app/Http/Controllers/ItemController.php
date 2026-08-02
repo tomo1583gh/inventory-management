@@ -474,4 +474,46 @@ class ItemController extends Controller
             ->route('items.index')
             ->with('success', '商品ＣＳＶをインポートしました。');
     }
+
+    /*
+    * 商品CSVインポート用テンプレート
+    */
+    public function downloadTemplate()
+    {
+        $fileName = 'item_import.template.csv';
+
+        return response()->streamDownload(
+            function () {
+                $handle = fopen('php://output', 'w');
+
+                // Excelで文字化けしにくいようにUTF-8のBOMを付ける
+                fwrite($handle, "\xEF\xBB\xBF");
+
+                fputcsv($handle, [
+                    'カテゴリー',
+                    '商品名',
+                    '管理番号',
+                    '単位',
+                    '最低在庫数',
+                    '商品メモ',
+                ]);
+
+                // 入力例
+                fputcsv($handle, [
+                    '肥料',
+                    '化成肥料14-14-14',
+                    'FER-001',
+                    '袋',
+                    '5',
+                    '湿気を避けて保管',
+                ]);
+
+                fclose($handle);
+            },
+            $fileName,
+            [
+                'Content-Type' => 'text/csv; charset=UTF-8',
+            ]
+        );
+    }
 }
