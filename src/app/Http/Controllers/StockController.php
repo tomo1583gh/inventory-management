@@ -9,6 +9,8 @@ use App\Models\Item;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Http\Requests\StockCorrectionRequest;
+use App\Http\Requests\StockLogImportRequest;
+use Carbon\Carbon;
 
 class StockController extends Controller
 {
@@ -494,5 +496,270 @@ class StockController extends Controller
         return redirect()
         ->route('items.logs', $stockLog->item_id)
         ->with('success', '入出庫履歴を訂正しました。');
+    }
+
+    /*
+    * 入出庫CSVインポート画面
+    */
+    public function createImport()
+    {
+        return view('stocks.import');
+    }
+
+    /*
+    * 入出庫CSVインポート用テンプレート
+    */
+    public function downloadImportTemplate()
+    {
+        $fileName = 'stock_log_import_template.csv';
+
+        return response()->streamDownload(
+            function () {
+                $handle = fopen('php://output', 'w');
+
+                fwrite($handle, "\xEF\xBB\XBF");
+
+                fputcsv($handle, [
+                    '管理番号',
+                    '区分',
+                    '数量',
+                    '作業日時',
+                    '入出庫メモ',
+                ]);
+
+                fputcsv($handle, [
+                    'FER-001',
+                    '入庫',
+                    '2',
+                    '2026-08-02 09:00',
+                    '仕入れ',
+                ]);
+
+                fputcsv($handle, [
+                    'FER-001',
+                    '出庫',
+                    '2',
+                    '2026-08-02 14:30',
+                    '畑Aで使用',
+                ]);
+
+                fclose($handle);
+            },
+            $fileName,
+            [
+                'Content-type' => 'text/csv; charset=UTF-8',
+            ]
+        );
+    }
+
+    /*
+    * 入出庫インポート
+    */
+    public function importCsv(StockLogImportRequest $request)
+    {
+        $file = $request->file('csv_file');
+
+        $handle = fopen($file->getRealPath(), 'r');
+
+        if ($handle === false) {
+            return back()
+                ->withErrors([
+                    'csv_file' => 'CSVファイルを読み込めませんでした。',
+                ]);
+        }
+
+        // 1行目をヘッダーとして取得
+        $header = fgetcsv($handle);
+
+        if ($header === false) {
+            fclose($handle);
+
+            return back()
+                ->withErrors([
+                    'csv_file' => 'CSVファイルにヘッダー行がありません。',
+                ]);
+        }
+
+        // UTF-8 BOMを除去
+        $header[0] = preg_replace(
+            '/^\xEF\xBB\xBF/',
+            '',
+            $header[0]
+        );
+
+        $header = array_map('trim', $header);
+
+        $expectedHeader = [
+            '管理番号',
+            '区分',
+            '数量',
+            '作業日時',
+            '入出庫メモ',
+        ];
+
+        if ($header !== $expectedHeader) {
+            fclose($handle);
+
+            return back()
+                ->withErrors([
+                    'csv_file' =>
+                        'CSVのヘッダーまたは列の順番が正しくありません。',
+                ]);
+        }
+
+        $rows = [];
+        $lineNumber = 1;
+
+        // 2行目以降を読み込む
+        while (($row = fgetcsv($handle)) !== false) {
+            $lineNumber++;
+
+            $isEmptyRow = count(array_filter(
+                $row,
+                fn ($value) => trim((string) $value) !== ''
+            )) === 0;
+
+            if ($isEmptyRow) {
+                continue;
+            }
+
+            $rows[] = [
+                'line_number' => $lineNumber,
+                'data' => $row,
+            ];
+        }
+
+        fclose($handle);
+
+        try {
+            DB::transaction(function () use ($rows, $request) {
+                foreach ($rows as $rowData) {
+                    $lineNumber = $rowData['line_number'];
+                    $row = $rowData['data'];
+
+                    /*
+                    * 数列チェック
+                    */
+                    if (count($row) !== 5) {
+                        throw new \RuntimeException(
+                            "{$lineNumber}行目の列数が正しくありません。5列で入力してください。"
+                        );
+                    }
+
+                    [
+                        $sku,
+                        $type,
+                        $qty,
+                        $actedAt,
+                        $note,
+                    ] = $row;
+
+                    $sku = trim($sku);
+                    $type = trim($type);
+                    $qty = trim($qty);
+                    $actedAt = trim($actedAt);
+                    $note = trim($note);
+
+                    /*
+                    * 必須項目チェック
+                    */
+                    if ($sku === '') {
+                        throw new \RuntimeException(
+                            "{$lineNumber}行目：管理番号を入力してください。"
+                        );
+                    }
+
+                    if ($type === '') {
+                        throw new \RuntimeException(
+                            "{$lineNumber}行目：区分を入力してください。"
+                        );
+                    }
+
+                    if ($qty === '') {
+                        throw new \RuntimeException(
+                            "{$lineNumber}行目：数量を入力してください。"
+                        );
+                    }
+
+                    if ($actedAt === '') {
+                        throw new \RuntimeException(
+                            "{$lineNumber}行目：作業日時を入力してください。"
+                        );
+                    }
+
+                    /*
+                    * 商品在庫チェック
+                    */
+                    $item = Item::where('sku', $sku)->first();
+
+                    if ($item === null) {
+                        throw new \RuntimeException(
+                            "{$lineNumber}行目：管理番号「{$sku}」の商品は登録されていません。"
+                        );
+                    }
+
+                    /*
+                    * 区分チェック
+                    */
+                    if (!in_array($type, ['入庫', '出庫'], true)) {
+                        throw new \RuntimeException(
+                            "{$lineNumber}行目：区分は「入庫」または「出庫」で入力してください。"
+                        );
+                    }
+
+                    /*
+                    * 数量チェック
+                    */
+                    if (!is_numeric($qty)) {
+                        throw new \RuntimeException(
+                            "{$lineNumber}行目：数量は数値で入力してください。"
+                        );
+                    }
+                    if ((float) $qty <= 0) {
+                        throw new \RuntimeException(
+                            "{$lineNumber}行目：数量は0より大きい値を入力してください。"
+                        );
+                    }
+
+                    /*
+                    * 作業日時チェック
+                    */
+                    try {
+                        $parsedActedAt = Carbon::createFromFormat(
+                            'Y-m-d H:i',
+                            $actedAt
+                        );
+
+                        if (
+                            $parsedActedAt->format('Y-m-d H:i')
+                            !== $actedAt
+                        ) {
+                            throw new \RuntimeException();
+                        }
+                    } catch (\Throwable $e) {
+                        throw new \RuntimeException(
+                            "{$lineNumber}行目：作業日時は「YYYY-MM-DD HH:MM」形式で入力してください。"
+                        );
+                    }
+
+                    StockLog::create([
+                        'item_id' => $item->id,
+                        'user_id' => $request->user()->id,
+                        'type' => $type === '入庫' ? 'in' : 'out',
+                        'qty' => $qty,
+                        'acted_at' => $parsedActedAt,
+                        'note' => $note !== '' ? $note : null,
+                    ]);
+                }
+            });
+        } catch (\RuntimeException $e) {
+            return back()
+                ->withErrors([
+                    'csv_file' => $e->getMessage(),
+                ]);
+        }
+        return redirect()
+            ->route('stocks.logs')
+            ->with('success', '入出庫CSVをインポートしました。');
     }
 }

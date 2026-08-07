@@ -1,5 +1,9 @@
 @extends('layouts.app')
 
+@section('css')
+    <link rel="stylesheet" href="{{ asset('css/items.css') }}">
+@endsection
+
 @section('title', '商品別入出庫履歴')
 
 @section('content')
@@ -8,7 +12,7 @@
 
 <table>
     <tr>
-      <th>商品名</th>
+        <th>商品名</th>
         <td>{{ $item->name }}</td>
         
     </tr>
@@ -97,7 +101,7 @@
         </tr>
 
         @empty
-      
+
         <tr>
             <td colspan="6" class="text=center">
                 入出庫履歴はありません。

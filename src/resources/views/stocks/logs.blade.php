@@ -1,5 +1,9 @@
 @extends('layouts.app')
 
+@section('css')
+    <link rel="stylesheet" href="{{ asset('css/stocks.css') }}">
+@endsection
+
 @section('title', '入出庫履歴')
 
 @section('content')
@@ -7,11 +11,19 @@
 
     <h2>入出庫履歴</h2>
 
-    <p>
-        <a href="{{ route('stocks.logs.export.csv') }}">
-            入出庫履歴をCSV出力
-        </a>
-    </p>
+    <div>
+        <p>
+            <a href="{{ route('stocks.import.create') }}">
+                入出庫CSVインポート
+            </a>
+        </p>
+
+        <p>
+            <a href="{{ route('stocks.logs.export.csv') }}">
+                入出庫履歴をCSV出力
+            </a>
+        </p>
+    </div>
 
     @if (session('success'))
         <p>{{ session('success') }}</p>
