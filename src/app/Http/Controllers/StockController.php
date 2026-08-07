@@ -312,32 +312,86 @@ class StockController extends Controller
     /**
      * 入出庫履歴
      */
-    public function logs()
+    public function logs(Request $request)
     {
+        $itemId = $request->input('item_id');
+        $type = $request->input('type');
+        $dateFrom = $request->input('date_from');
+        $dateTo = $request->input('date_to');
+
+        /*
+        * 不正な区分が指定された場合は」、区分なしへ戻す
+        */
+        if (!in_array($type, ['in', 'out'], true)) {
+            $type = null;
+        }
+
         $logs = StockLog::with([
             'item.category',
             'user',
             'correctedLog',
             'correctionLog',
         ])
+        ->when($itemId, function ($query,$itemId) {
+            $query->where('item_id', $itemId);
+        })
+        ->when($type, function ($query, $type) {
+            $query->where('type', $type);
+        })
+        ->when($dateFrom, function ($query,$dateFrom) {
+            $query->where('acted_at', '>=', $dateFrom);
+        })
+        ->when($dateTo, function ($query, $dateTo) {
+            $query->where('acted_at', '<=', $dateTo);
+        })
         ->orderByDesc('acted_at')
         ->orderByDesc('id')
-        ->paginate(20);
+        ->paginate(20)
+        ->withQueryString();
 
-        return view('stocks.logs', compact('logs'));
+    $items = Item::orderBy('name')->get();
+
+        return view('stocks.logs', compact(
+            'logs',
+            'items',
+            'itemId',
+            'type',
+            'dateFrom',
+            'dateTo'
+        ));
     }
 
     /*
     * 入出庫履歴CSV出力
     */
-    public function exportLogsCsv()
+    public function exportLogsCsv(Request $request)
     {
+        $itemId = $request->input('item_id');
+        $type = $request->input('type');
+        $dateFrom = $request->input('date_from');
+        $dateTo = $request->input('date_to');
+
+        if (!in_array($type, ['in', 'out'], true)) {
+            $type = null;
+        }
         $logs = StockLog::with([
             'item.category',
             'user',
             'correctedLog',
             'correctionLog',
         ])
+            ->when($itemId, function ($query, $itemId) {
+                $query->where('item_id', $itemId);
+            })
+            ->when($type, function ($query, $type) {
+                $query->where('type', $type);
+            })
+            ->when($dateFrom, function ($query, $dateFrom) {
+                $query->whereDate('acted_at', '>=', $dateFrom);
+            })
+            ->when($dateTo, function ($query, $dateTo) {
+                $query->whereDate('acted_at', '<=', $dateTo);
+            })
             ->orderByDesc('acted_at')
             ->orderByDesc('id')
             ->get();

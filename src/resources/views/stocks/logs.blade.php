@@ -11,6 +11,70 @@
 
     <h2>入出庫履歴</h2>
 
+    <form action="{{ route('stocks.logs') }}" method="GET">
+
+        <div>
+            <label for="item_id">商品</label>
+
+            <select id="item_id" name="item_id">
+                <option value="">すべて</option>
+
+                @foreach ($items as $item)
+                    <option
+                        value="{{ $item->id }}"
+                        @selected($itemId == $item->id)
+                    >
+                        {{ $item->name }} ({{ $item->sku }})
+                    </option>
+                @endforeach
+            </select>
+        </div>
+
+        <div>
+            <label for="type">区分</label>
+
+            <select id="type" name="type">
+                <option value="">すべて</option>
+                <option value="in" @selected($type === 'in')>
+                    入庫
+                </option>
+                <option value="out" @selected($type === 'out')>
+                    出庫
+                </option>
+            </select>
+        </div>
+
+        <div>
+            <label for="date_from">開始日</label>
+
+            <input
+                type="date"
+                id="date_from"
+                name="date_from"
+                value="{{ $dateFrom }}"
+            >
+        </div>
+
+        <div>
+            <label for="date_to">終了日</label>
+
+            <input
+                type="date"
+                id="date_to"
+                name="date_to"
+                value="{{ $dateTo }}"
+            >
+        </div>
+
+        <button type="submit">
+            検索
+        </button>
+
+        <a href="{{ route('stocks.logs') }}">
+            リセット
+        </a>
+    </form>
+
     <div>
         <p>
             <a href="{{ route('stocks.import.create') }}">
@@ -19,7 +83,12 @@
         </p>
 
         <p>
-            <a href="{{ route('stocks.logs.export.csv') }}">
+            <a href="{{ route('stocks.logs.export.csv', [
+                'item_id' => $itemId,
+                'type' => $type,
+                'date_from' => $dateFrom,
+                'date_to' => $dateTo,
+            ]) }}">
                 入出庫履歴をCSV出力
             </a>
         </p>
