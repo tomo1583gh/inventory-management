@@ -12,31 +12,92 @@
 
 <body>
 
-    <h1>
-    <a href="{{ route('dashboard') }}">
-        農業在庫管理システム
-    </a>
-</h1>
+    <header>
+        <h1>
+            <a href="{{ route('dashboard') }}">
+                農業在庫管理システム
+            </a>
+        </h1>
+
+        @auth
+            <nav>
+                <ul class="main-nav">
+                    <li> 
+                        <a 
+                        href="{{ route('dashboard') }}"
+                        class="{{ request()->routeIs('dashboard') ? 'active' : '' }}"
+                        >
+                            ダッシュボード
+                        </a>
+                    </li>
+
+                    <li>
+                        <a 
+                        href="{{ route('items.index') }}"
+                        class="{{ request()->routeIs('items.*') ? 'active' : '' }}"
+                        >
+                            商品一覧
+                        </a>
+                    </li>
+
+                    <li>
+                        <a 
+                        href="{{ route('stocks.index') }}"
+                        class="{{ request()->routeIs('stocks.in.*') ? 'active' : '' }}"
+                        >
+                            在庫一覧
+                        </a>
+                    </li>
+
+                    <li>
+                        <a 
+                        href="{{ route('stocks.in.create') }}"
+                        class="{{ request()->routeIs('stocks.in.*') ? 'active' : '' }}"
+                        >
+                            入庫登録
+                        </a>
+                    </li>
+
+                    <li>
+                        <a 
+                        href="{{ route('stocks.out.create') }}"
+                        class="{{ request()->routeIs('stocks.out.*') ? 'active' : '' }}"
+                        >
+                            出庫登録
+                        </a>
+                    </li>
+
+                    <li>
+                        <a 
+                        href="{{ route('stocks.logs') }}"
+                        class="{{ request()->routeIs('stocks.logs.*') ? 'active' : '' }}"
+                        >
+                            入出庫履歴
+                        </a>
+                    </li>
+
+                    <li>
+                        <form 
+                            action="{{ route('logout') }}" 
+                            method="POST"
+                            class="logout-form"
+                        >
+                            @csrf
+
+                            <button 
+                                type="submit"
+                                class="logout-button"
+                                >
+                                    ログアウト
+                            </button>
+                        </form>
+                    </li>
+                </ul>
+            </nav>
+        @endauth
+    </header>
 
     <hr>
-
-    @auth
-        <nav>
-            <a href="{{ route('dashboard') }}">ダッシュボード</a> |
-            <a href="{{ route('items.index') }}">商品一覧</a> |
-            <a href="{{ route('stocks.index') }}">在庫一覧</a> |
-            <a href="{{ route('stocks.in.create') }}">入庫登録</a> |
-            <a href="{{ route('stocks.out.create') }}">出庫登録</a> |
-            <a href="{{ route('stocks.logs') }}">入出庫履歴</a> |
-
-            <form action="{{ route('logout') }}" method="POST" style="display:inline">
-                @csrf
-                <button type="submit">ログアウト</button>
-            </form>
-        </nav>
-
-    <hr>
-    @endauth
 
     @if(session('success'))
         <p style="color: green">
@@ -44,7 +105,9 @@
         </p>
     @endif
 
-    @yield('content')
+    <main class="container">
+        @yield('content')
+    </main>
 
 </body>
 </html>

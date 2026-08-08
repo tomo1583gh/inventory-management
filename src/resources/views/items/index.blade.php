@@ -28,27 +28,30 @@
     </form>
 
     <div class="item-actions">
-        <a href="{{ route('items.create') }}">
+        <a 
+            href="{{ route('items.create') }}"
+            class="btn btn-primary"
+        >
             商品を登録する
         </a>
 
-        <a href="{{ route('items.import.create')}}">
+        <a 
+            href="{{ route('items.import.create')}}"
+            class="btn btn-secondary"
+        >
             商品CSVインポート
-        </a>
-
-        <a href="{{ route('items.export.csv', [
-            'q' => $q,
-            'sku' => $sku,
-            'category_id' => $categoryId,
-            'sort' => $sort,
-            'direction' => $direction,
-        ]) }}">
-            商品一覧CSV出力
         </a>
     </div>
 
+    <h3 class="search-title">
+            検索条件
+        </h3>
 
-    <form action="{{ route('items.index') }}" method="GET"> 
+    <form 
+        action="{{ route('items.index') }}" 
+        method="GET"
+        class="search-form"
+    > 
         
         <div>
             <label for="category_id">カテゴリー</label>
@@ -107,27 +110,40 @@
             </select>
         </div>
 
-        <button type="submit">
-            検索
-        </button>
+        <div class="search-actions">
+            <button 
+                type="submit"
+                class="btn btn-primary"
+            >
+                検索
+            </button>
 
-        <a href="{{ route('items.index') }}">
-            リセット
-        </a>
+            <a 
+                href="{{ route('items.index') }}"
+                class="btn-light"
+            >
+                リセット
+            </a>
+        </div>
 
     </form>
 
-    <p>
-        <a href="{{ route('items.export.csv', [
-            'q' => $q,
-            'sku' => $sku,
-            'category_id' => $categoryId,
-            'sort' => $sort,
-            'direction' => $direction,
-        ]) }}">
-            商品一覧CSV出力
-        </a>
-    </p>
+    <div class="list-actions">
+        <p>
+            <a 
+                href="{{ route('items.export.csv', [
+                    'q' => $q,
+                    'sku' => $sku,
+                    'category_id' => $categoryId,
+                    'sort' => $sort,
+                    'direction' => $direction,
+                ]) }}"
+                class="btn btn-secondary"
+            >
+                商品一覧CSV出力
+            </a>
+        </p>
+    </div>
 
     @if ($items->isEmpty())
         <p>商品が登録されていません。</p>
@@ -137,99 +153,101 @@
             $nextDirection = $direction === 'asc' ? 'desc' : 'asc';
         @endphp
 
-        <table border="1">
-            <thead>
-                <tr>
-                    <th>
-                        <a href="{{ route('items.index', array_merge(request()->query(), [
-                            'sort' => 'created_at',
-                            'direction' => $sort === 'created_at'
-                                ? $nextDirection
-                                : 'desc',
-                            'page' => 1,
-                        ])) }}">
-                            登録日
+        <div class="table-wrapper">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>
+                            <a href="{{ route('items.index', array_merge(request()->query(), [
+                                'sort' => 'created_at',
+                                'direction' => $sort === 'created_at'
+                                    ? $nextDirection
+                                    : 'desc',
+                                'page' => 1,
+                            ])) }}">
+                                登録日
 
-                            @if ($sort === 'created_at')
-                                {{ $direction === 'asc' ? '▲' : '▼' }}
-                            @endif
-                        </a>
-                    </th>
-                    <th>ID</th>
-                    <th>
-                        <a href="{{ route('items.index', array_merge(request()->query(),[
-                        'sort' => 'category',
-                        'direction' => $sort === 'category'
-                            ? $nextDirection
-                            : 'asc',
-                        'page' => 1,
-                        ])) }}">
-                            カテゴリー
-                        
-                            @if ($sort === 'category')
-                                {{ $direction === 'asc' ? '▲' : '▼' }}
-                            @endif
-                        </a>
-                    </th>
-                    <th>
-                        <a href="{{ route('items.index', array_merge(request()->query(),[
-                            'sort' => 'name',
-                            'direction' => $sort === 'name'
+                                @if ($sort === 'created_at')
+                                    {{ $direction === 'asc' ? '▲' : '▼' }}
+                                @endif
+                            </a>
+                        </th>
+                        <th>ID</th>
+                        <th>
+                            <a href="{{ route('items.index', array_merge(request()->query(),[
+                            'sort' => 'category',
+                            'direction' => $sort === 'category'
                                 ? $nextDirection
                                 : 'asc',
                             'page' => 1,
-                        ])) }}">
-                            商品名
+                            ])) }}">
+                                カテゴリー
                         
-                        @if ($sort === 'name')
-                            {{ $direction === 'asc' ? '▲' : '▼' }}
-                        @endif
-                        </a>
-                    </th>
-                    <th>管理番号</th>
-                    <th>単位</th>
-                    <th>操作</th>
-                </tr>
-            </thead>
-
-            <tbody>
-                @foreach ($items as $item)
-                    <tr>
-                        <td>{{ $item->created_at->format('Y/m/d') }}</td>
-                        <td>{{ $item->id }}</td>
-                        <td class="text-center">{{ $item->category?->name ?? '未設定' }}</td>
-                        <td class="text-center">
-                            <a href="{{ route('items.show', $item) }}">
-                                {{ $item->name }}
+                                @if ($sort === 'category')
+                                    {{ $direction === 'asc' ? '▲' : '▼' }}
+                                @endif
                             </a>
-                        </td>
-                        <td class="text-center">{{ $item->sku }}</td>
-                        <td class="text-center">{{ $item->unit }}</td>
-                        <td>
-                            <a href="{{ route('items.edit', $item) }}">
-                                編集
+                        </th>
+                        <th>
+                            <a href="{{ route('items.index', array_merge(request()->query(),[
+                                'sort' => 'name',
+                                'direction' => $sort === 'name'
+                                    ? $nextDirection
+                                    : 'asc',
+                                'page' => 1,
+                            ])) }}">
+                                商品名
+                        
+                            @if ($sort === 'name')
+                                {{ $direction === 'asc' ? '▲' : '▼' }}
+                            @endif
                             </a>
-
-                            <form
-                                action="{{ route('items.destroy', $item) }}"
-                                method="POST"
-                                style="display: inline;"
-                            >
-                                @csrf
-                                @method('DELETE')
-
-                                <button
-                                    type="submit"
-                                    onclick="return confirm('この商品を削除しますか？')"
-                                >
-                                    削除
-                                </button>
-                            </form>
-                        </td>
+                        </th>
+                        <th>管理番号</th>
+                        <th>単位</th>
+                        <th>操作</th>
                     </tr>
-                @endforeach
-            </tbody>
-        </table>
+                </thead>
+
+                <tbody>
+                    @foreach ($items as $item)
+                        <tr>
+                            <td>{{ $item->created_at->format('Y/m/d') }}</td>
+                            <td>{{ $item->id }}</td>
+                            <td class="text-center">{{ $item->category?->name ?? '未設定' }}</td>
+                            <td class="text-center">
+                                <a href="{{ route('items.show', $item) }}">
+                                    {{ $item->name }}
+                                </a>
+                            </td>
+                            <td class="text-center">{{ $item->sku }}</td>
+                            <td class="text-center">{{ $item->unit }}</td>
+                            <td>
+                                <a href="{{ route('items.edit', $item) }}">
+                                    編集
+                                </a>
+
+                                <form
+                                    action="{{ route('items.destroy', $item) }}"
+                                    method="POST"
+                                    style="display: inline;"
+                            >
+                                    @csrf
+                                    @method('DELETE')
+
+                                    <button
+                                        type="submit"
+                                        onclick="return confirm('この商品を削除しますか？')"
+                                    >
+                                        削除
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
 
         {{ $items->links() }}
     @endif

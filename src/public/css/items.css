@@ -37,8 +37,80 @@
   border: 1px solid #c3e6cb;
 }
 
-.item-actions {
+.item-actions,
+.list-actions {
   display: flex;
   flex-direction: column;
+  align-items: flex-start;
+  margin-left: 0;
+  padding-left: 0;
+}
+
+.item-actions {
   gap: 10px;
+  margin-top: 20px;
+  margin-bottom: 30px;
+}
+
+.item-actions .btn,
+.list-actions .btn {
+  width: 220px;
+}
+
+.list-actions {
+  margin: 30px;
+  margin-bottom: 20px;
+  margin-left: 0;
+  padding-left: 0;
+}
+
+.search-form {
+  width: 100%;
+  max-width: 900px;
+  padding: 24px 30px;
+  margin-top: 30px;
+  margin-bottom: 30px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  background: #fafafa;
+}
+
+.search-form label {
+  width: 180px;
+  display: inline-block;
+  width: 120px;
+  font-weight: bold;
+}
+
+.search-form input,
+.search-form select {
+  width: 100%;
+  max-width: 630px;
+  padding: 8px 10px;
+  box-sizing: border-box;
+}
+
+.search-form div {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.search-actions div:not(.search-actions) {
+  display: flex;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.search-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.search-title {
+  margin-bottom: 10px;
+  font-size: 1.2rem;
+  font-weight: bold;
 }
