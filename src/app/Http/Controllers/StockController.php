@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\DB;
 use App\Http\Requests\StockCorrectionRequest;
 use App\Http\Requests\StockLogImportRequest;
 use Carbon\Carbon;
+use App\Models\Category;
 
 class StockController extends Controller
 {
@@ -71,8 +72,13 @@ class StockController extends Controller
      */
     public function index(Request $request)
     {
+        $q = $request->input('q');
+        $sku = $request->input('sku');
+        $categoryId = $request->input('category_id');
+        $status = $request->input('status');
+
         $sort = $request->input('sort', 'name');
-        $direction = $request->input('direction','asc');
+        $direction = $request->input('direction', 'asc');
 
         $allowedSorts = [
             'name',
@@ -87,15 +93,22 @@ class StockController extends Controller
         /*
         * 許可していない並び替え項目が指定された場合は商品名順に戻す
         */
-        if (!in_array($sort, $allowedSorts,true)) {
+        if (!in_array($sort, $allowedSorts, true)) {
             $sort = 'name';
         }
 
         /*
-        * asc , desc以外が指定された場合は昇順に戻す。
+        * asc, desc以外が指定された場合は昇順に戻す
         */
         if (!in_array($direction, $allowedDirections,true)) {
             $direction = 'asc';
+        }
+
+        /*
+        * 許可されていない在庫状態が指定された場合は指定なしに戻す
+        */
+        if (!in_array($status,['normal', 'low', 'out'], true)) {
+            $status = null;
         }
 
         $stocks = Item::query()
@@ -117,6 +130,7 @@ class StockController extends Controller
                 'items.sku',
                 'items.unit',
                 'items.minimum_stock',
+                'items.category_id',
                 'categories.name as category_name'
             )
             ->selectRaw("
@@ -135,30 +149,111 @@ class StockController extends Controller
                     0
                 ) as current_qty
             ")
+
+            /*
+            * 商品検索
+            */
+            ->when($q, function ($query, $q) {
+                $query->where(
+                    'items.name',
+                    'like',
+                    "%{$q}%"
+                );
+            })
+
+            /*
+            * 管理番号検索
+            */
+            ->when($sku, function ($query, $sku) {
+                $query->where(
+                    'items.sku',
+                    'like',
+                    "%{$sku}%"
+                );    
+            })
+
+            /*
+            * カテゴリー検索
+            */
+            ->when($categoryId, function ($query, $categoryId) {
+                $query->where(
+                    'items.category_id',
+                    $categoryId
+                );
+            })
+
             ->groupBy(
                 'items.id',
                 'items.name',
                 'items.sku',
                 'items.unit',
                 'items.minimum_stock',
+                'items.category_id',
                 'categories.name'
-            )
-            ->when(
-                $sort === 'stock',
-                function ($query) use ($direction) {
-                    $query->orderBy('current_qty', $direction);
-                },
-                function ($query) use ($direction) {
-                    $query->orderBy('items.name', $direction);
-                }
-            )
-            ->paginate(10)
-            ->withQueryString();
+            );
+
+            /*
+            *　在庫状況検索
+            */
+            if ($status === 'out') {
+                $status->havingRaw(
+                    'current_qty <= 0'
+                );
+            }
+
+            if ($status === 'low') {
+                $status->havingRaw(
+                    'current_qty > 0
+                    AND items.minimum_stock > 0
+                    AND current_qty <= items.minimum_stock'
+                );
+            }
+
+            if ($status === 'normal') {
+                $status->havingRaw(
+                    'current_qty > items.minimumstock
+                    OR items.minimum_stock = 0'
+                );
+            }
+
+            /*
+            * 並び替え
+            */
+            $stocks
+                ->when(
+                    $sort === 'stock',
+                    function ($query) use ($direction) {
+                        $query->orderBy(
+                            'current_qty', 
+                            $direction
+                        );
+                    },
+                    function ($query) use ($direction) {
+                        $query->orderBy(
+                            'items.name', 
+                            $direction
+                        );
+                    }
+                );
+
+            $stocks = $stocks
+                ->paginate(10)
+                ->withQueryString();
+
+            /*
+            * 検索フォームカテゴリー
+            */
+            $categories = Category::orderBy('name')->get();
 
         return view(
             'stocks.index', 
             compact(
                 'stocks',
+                'categories',
+                'q',
+                'sku',
+                'categoryId',
+                'status',
                 'sort',
                 'direction'
             )
@@ -170,6 +265,11 @@ class StockController extends Controller
     */
     public function exportCsv(Request $request)
     {
+        $q = $request->input('q');
+        $sku = $request->input('sku');
+        $categoryId = $request->input('category_id');
+        $status = $request->input('status');
+
         $sort = $request->input('sort', 'name');
         $direction = $request->input('direction', 'asc');
 
@@ -197,6 +297,13 @@ class StockController extends Controller
             $direction = 'asc';
         }
 
+        /*
+        * 許可されていない在庫状態の場合は指定なしに戻す
+        */
+        if (!in_array($status, ['normal', 'low', 'out'], true)) {
+            $status = null;
+        }
+
         $stocks = Item::query()
             ->leftJoin(
                 'categories',
@@ -216,6 +323,7 @@ class StockController extends Controller
                 'items.sku',
                 'items.unit',
                 'items.minimum_stock',
+                'items.category_id',
                 'categories.name as category_name'
             )
             ->selectRaw("
@@ -234,24 +342,99 @@ class StockController extends Controller
                     0
                 ) as current_qty
             ")
+            
+            /*
+            * 商品名検索
+            */
+            ->when($q, function ($query,$q) {
+                $query->where(
+                    'items.name',
+                    'like',
+                    "%{$q}%"
+                );
+            })
+
+            /*
+            * 管理番号検索
+            */
+            ->when($sku, function ($query, $sku) {
+                $query->where(
+                    'items.sku',
+                    'like',
+                    "%{$sku}%"
+                );
+            })
+
+            /*
+            * カテゴリー検索
+            */
+            ->when($categoryId, function ($query, $categoryId) {
+                $query->where(
+                    'items.category_id',
+                    $categoryId
+                );
+            })
+
             ->groupBy(
                 'items.id',
                 'items.name',
                 'items.sku',
                 'items.unit',
                 'items.minimum_stock',
+                'items.category_id',
                 'categories.name'
-            )
+            );
+
+        /*
+        * 在庫状況検索
+        */
+        if ($status === 'out') {
+            $stocks->havingRaw(
+                'current_qty <= 0'
+            );
+        }
+
+        if ($status === 'low') {
+            $stocks->havingRaw(
+                'current_qty > 0
+                AND items.minimum_stock > 0
+                AND current_qty <= items.minimum_stock'
+            );
+        }
+
+        if ($status === 'normal') {
+            $stocks->havingRaw(
+                'current_qty > 0
+                AND (
+                    items.minimum_stock = 0
+                    OR current_qty > items.minimum_stock
+                )'
+            );
+        }
+
+        /*
+        * 並び替え
+        */
+        $stocks
             ->when(
                 $sort === 'stock',
                 function ($query) use ($direction) {
-                    $query->orderBy('current_qty', $direction);
+                    $query->orderBy(
+                        'current_qty', 
+                        $direction
+                    );
                 },
                 function ($query) use ($direction) {
-                    $query->orderBy('items.name', $direction);
+                    $query->orderBy(
+                        'items.name', 
+                        $direction
+                    );
                 }
-            )
-            ->get();
+            );
+        /*
+        * データ取得
+        */
+        $stocks = $stocks->get();
 
         $fileName = 'stocks_' . now()->format('Ymd_His') . '.csv';
 
@@ -279,14 +462,16 @@ class StockController extends Controller
 
                 foreach ($stocks as $stock) {
                     if ($stock->current_qty <= 0) {
-                        $status = '在庫切れ';
+                        $stockStatus = '在庫切れ';
+
                     } elseif (
-                        $stock->minimum_stock > 0
-                        && $stock-> current_qty <= $stock->minimum_stock
+                        $stock->minimum_stock > 0 &&
+                        $stock-> current_qty <= $stock->minimum_stock
                     ) {
-                        $status = '在庫不足';
+                        $stockStatus = '在庫不足';
+
                     } else {
-                        $status = '在庫あり';
+                        $stockStatus = '正常';
                     }
 
                     fputcsv($handle, [
@@ -296,7 +481,7 @@ class StockController extends Controller
                         $stock->current_qty,
                         $stock->unit,
                         $stock->minimum_stock,
-                        $status,
+                        $stockStatus,
                     ]);
                 }
 

@@ -157,7 +157,7 @@
             <table class="table">
                 <thead>
                     <tr>
-                        <th>
+                        <th class="text-left">
                             <a href="{{ route('items.index', array_merge(request()->query(), [
                                 'sort' => 'created_at',
                                 'direction' => $sort === 'created_at'
@@ -212,36 +212,42 @@
                 <tbody>
                     @foreach ($items as $item)
                         <tr>
-                            <td>{{ $item->created_at->format('Y/m/d') }}</td>
-                            <td>{{ $item->id }}</td>
+                            <td class="text-center">{{ $item->created_at->format('Y/m/d') }}</td>
+                            <td class="text-center">{{ $item->id }}</td>
                             <td class="text-center">{{ $item->category?->name ?? '未設定' }}</td>
-                            <td class="text-center">
+                            <td class="text-left">
                                 <a href="{{ route('items.show', $item) }}">
                                     {{ $item->name }}
                                 </a>
                             </td>
                             <td class="text-center">{{ $item->sku }}</td>
                             <td class="text-center">{{ $item->unit }}</td>
-                            <td>
-                                <a href="{{ route('items.edit', $item) }}">
-                                    編集
-                                </a>
-
-                                <form
-                                    action="{{ route('items.destroy', $item) }}"
-                                    method="POST"
-                                    style="display: inline;"
-                            >
-                                    @csrf
-                                    @method('DELETE')
-
-                                    <button
-                                        type="submit"
-                                        onclick="return confirm('この商品を削除しますか？')"
+                            <td class="text-center">
+                                <div class="action-buttons">
+                                    <a 
+                                        href="{{ route('items.edit', $item) }}"
+                                        class="btn btn-light btn-sm"
                                     >
-                                        削除
-                                    </button>
-                                </form>
+                                        編集
+                                    </a>
+
+                                    <form
+                                        action="{{ route('items.destroy', $item) }}"
+                                        method="POST"
+                                        class="action-form"
+                                    >
+                                        @csrf
+                                        @method('DELETE')
+
+                                        <button
+                                            type="submit"
+                                            class="btn btn-danger btn-sm"
+                                            onclick="return confirm('この商品を削除しますか？')"
+                                        >
+                                            削除
+                                        </button>
+                                    </form>
+                                </div>
                             </td>
                         </tr>
                     @endforeach
