@@ -82,3 +82,43 @@
   font-size: 1.2rem;
   font-weight: bold;
 }
+
+.detail-card {
+  width: 100%;
+  max-width: 600px;
+  padding: 24px;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+}
+
+.detail-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.detail-table th,
+.detail-table td {
+  padding: 12px 14px;
+  border-bottom: 1px solid #ddd;
+}
+
+.detail-table th {
+  width: 150px;
+  text-align: left;
+  background-color: #f5f7f5;
+  vertical-align: top;
+}
+
+.detail-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.memo-box {
+  background: #fafafa;
+  padding: 12px;
+  border-radius: 6px;
+}

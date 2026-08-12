@@ -14,10 +14,11 @@
     <form 
         action="{{ route('items.store') }}" 
         method="POST"
+        class="form-card"
     >
         @csrf
 
-        <div>
+        <div class="form-group">
             <label for="category_id">カテゴリー</label>
 
             <select
@@ -43,7 +44,7 @@
             @enderror
         </div>
 
-        <div>
+        <div class="form-group">
             <label for="name">商品名</label>
 
             <input
@@ -58,7 +59,7 @@
             @enderror
         </div>
 
-        <div>
+        <div class="form-group">
             <label for="sku">管理番号</label>
 
             <input
@@ -73,7 +74,7 @@
             @enderror
         </div>
 
-        <div>
+        <div class="form-group">
             <label for="unit">単位</label>
 
             <input
@@ -89,7 +90,7 @@
             @enderror
         </div>
 
-        <div>
+        <div class="form-group">
             <label for="minimum_stock">最低在庫数</label>
 
             <input
@@ -105,30 +106,35 @@
             @enderror
         </div>
 
-        <div>
-            <label class="text-area"  for="note">商品メモ</label>
+        <div class="form-group">
+            <label for="note">商品メモ</label>
 
             <textarea
                 id="note"
                 name="note"
                 rows="4"
-            >{{ old('note') }}
-            </textarea>
+            >{{ old('note') }}</textarea>
 
             @error('note')
                 <p class="error">{{ $message }}</p>
             @enderror
         </div>
 
-        <button type="submit">
-            登録
-        </button>
-    </form>
+        <div class="form-actions">
+            <button 
+                type="submit"
+                class="btn btn-primary"
+            >
+                登録
+            </button>
 
-    <p>
-        <a href="{{ route('items.index') }}">
-            商品一覧に戻る
-        </a>
-    </p>
+            <a
+                href="{{ route('items.index') }}"
+                class="btn-light"
+            >
+                商品一覧に戻る
+            </a>
+        </div>
+    </form>
 
     @endsection
