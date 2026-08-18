@@ -11,10 +11,14 @@
 
     <h2>出庫登録</h2>
 
-    <form action="{{ route('stocks.out.store') }}" method="POST">
+    <form 
+        action="{{ route('stocks.out.store') }}" 
+        method="POST"
+        class="form-card"
+    >
         @csrf
 
-        <div>
+        <div class="form-group">
             <label for="item_id">商品</label>
 
             <select id="item_id" name="item_id">
@@ -36,7 +40,7 @@
             @enderror
         </div>
 
-        <div>
+        <div class="form-group">
             <label for="qty">数量</label>
 
             <input
@@ -53,7 +57,7 @@
             @enderror
         </div>
 
-        <div>
+        <div class="form-group">
             <label for="acted_at">作業日</label>
 
             <input
@@ -68,12 +72,13 @@
             @enderror
         </div>
 
-        <div>
+        <div class="form-group">
             <label for="note">出庫メモ</label>
 
             <textarea
                 id="note"
                 name="note"
+                rows="4"
             >{{ old('note') }}</textarea>
 
             @error('note')
@@ -81,11 +86,21 @@
             @enderror
         </div>
 
-        <button type="submit">出庫を登録</button>
-    </form>
+        <div class="form-actions">
+            <button 
+            type="submit"
+            class="btn btn-primary"
+            >
+                出庫を登録
+            </button>
 
-    <p>
-        <a href="{{ route('items.index') }}">商品一覧へ戻る</a>
-    </p>
+            <a
+                href="{{ route('stocks.index') }}"
+                class="btn-light"
+            >
+                在庫一覧へ戻る
+            </a>
+        </div>
+    </form>
 
 @endsection

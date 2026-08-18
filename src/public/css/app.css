@@ -148,6 +148,7 @@ header nav {
 
 .table-wrapper {
   margin-top: 30px;
+  width: 100%;
   overflow-x: auto;
 }
 
@@ -333,7 +334,7 @@ header nav {
 
 .form-card {
   width: 100%;
-  max-width: 900px;
+  max-width: 750px;
   padding: 30px;
   border: 1px solid #ddd;
   border-radius: 10px;
@@ -370,3 +371,89 @@ header nav {
   margin-top: 24px;
 }
 
+.page-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 30px;
+}
+
+.error-list {
+  margin-top: 12px;
+  color: #c62828;
+}
+
+.error-list ul {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.import-actions {
+  margin-top: 20px;
+  margin-bottom: 30px;
+}
+
+.import-actions .btn {
+  width: 260px;
+}
+
+.detail-card {
+  width: 100%;
+  max-width: 600px;
+  padding: 24px;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+}
+
+.detail-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.detail-table th,
+.detail-table td {
+  padding: 12px 14px;
+  border-bottom: 1px solid #ddd;
+}
+
+.detail-table th {
+  width: 150px;
+  text-align: left;
+  background-color: #f5f7f5;
+  vertical-align: top;
+}
+
+.detail-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.form-title {
+  margin-top: 30px;
+  margin-bottom: 20px;
+}
+
+.log-status {
+  display: inline-block;
+  min-width: 70px;
+  padding: 5px 10px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: bold;
+  text-align: center;
+}
+
+.log-corrected {
+  color: #664d03;
+  background-color: #fff3cd;
+  border: 1px solid #ffe69c;
+}
+
+.log-correction {
+  color: #444;
+  background-color: #e9ecef;
+  border: 1px solid #ced4da;
+}

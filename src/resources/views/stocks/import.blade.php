@@ -10,26 +10,33 @@
 
 <h2>入出庫CSVインポート</h2>
 
-<p>
-    <a href="{{ route('stocks.import.template') }}">
+<div class="import-actions">
+    <a 
+        href="{{ route('stocks.import.template') }}"
+        class="btn btn-secondary"
+    >
         CSVテンプレートをダウンロード
     </a>
-</p>
-
-<p class="help-text">
-    ※　CSVの列順は「管理番号、区分、数量、作業日時、入出庫メモ」です。<br>
-    区分には「入庫」または「出庫」を入力してください。
-</p>
+</div>
 
 <form
     action="{{ route('stocks.import.store') }}"
     method="POST"
     enctype="multipart/form-data"
+    class="form-card"
 >
+
     @csrf
 
-    <div>
-        <label for="csv_file">CSVファイル</label>
+<p class="help-text">
+    ※ CSVの列順は「管理番号、区分、数量、作業日時、入出庫メモ」です。<br>
+    区分には「入庫」または「出庫」を入力してください。
+</p>
+
+    <div class="form-group">
+        <label for="csv_file">
+            CSVファイル
+        </label>
 
         <input
             type="file"
@@ -39,19 +46,27 @@
         >
 
         @error('csv_file')
-            <p class="error">{{ $message }}</p>
+            <p class="error">
+                {{ $message }}
+            </p>
         @enderror
     </div>
 
-    <button type="submit">
-        インポート
-    </button>
-</form>
+    <div class="form-actions">
+        <button
+            type="submit"
+            class="btn btn-primary"
+        >
+            インポート
+        </button>
 
-<p>
-    <a href="{{ route('stocks.logs') }}">
-        入出庫履歴へ戻る
-    </a>
-</p>
+        <a
+            href="{{ route('stocks.logs') }}"
+            class="btn-light"
+        >
+            入出庫履歴へ戻る
+        </a>
+    </div>
+</form>
 
 @endsection

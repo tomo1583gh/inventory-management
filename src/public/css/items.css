@@ -47,6 +47,9 @@
 }
 
 .item-actions {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
   gap: 10px;
   margin-top: 20px;
   margin-bottom: 30px;
@@ -58,9 +61,7 @@
 }
 
 .list-actions {
-  margin: 30px;
-  margin-bottom: 20px;
-  margin-left: 0;
+  margin: 30px 0 20px;
   padding-left: 0;
 }
 
@@ -81,40 +82,6 @@
   margin-bottom: 10px;
   font-size: 1.2rem;
   font-weight: bold;
-}
-
-.detail-card {
-  width: 100%;
-  max-width: 600px;
-  padding: 24px;
-  background-color: #fff;
-  border: 1px solid #ddd;
-  border-radius: 10px;
-}
-
-.detail-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.detail-table th,
-.detail-table td {
-  padding: 12px 14px;
-  border-bottom: 1px solid #ddd;
-}
-
-.detail-table th {
-  width: 150px;
-  text-align: left;
-  background-color: #f5f7f5;
-  vertical-align: top;
-}
-
-.detail-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  margin-top: 24px;
 }
 
 .memo-box {

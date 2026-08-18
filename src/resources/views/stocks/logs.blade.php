@@ -11,7 +11,15 @@
 
     <h2>入出庫履歴</h2>
 
-    <form action="{{ route('stocks.logs') }}" method="GET">
+    <h3 class="search-title">
+        検索条件
+    </h3>
+
+    <form 
+        action="{{ route('stocks.logs') }}" 
+        method="GET"
+        class="search-form"
+    >
 
         <div>
             <label for="item_id">商品</label>
@@ -66,32 +74,41 @@
             >
         </div>
 
-        <button type="submit">
-            検索
-        </button>
+        <div class="search-actions">
+            <button 
+                type="submit"
+                class="btn btn-primary"
+            >
+                検索
+            </button>
 
-        <a href="{{ route('stocks.logs') }}">
+            <a href="{{ route('stocks.logs') }}"
+            class="btn-light"
+        >
             リセット
-        </a>
+            </a>
+        </div>
     </form>
 
-    <div>
-        <p>
-            <a href="{{ route('stocks.import.create') }}">
-                入出庫CSVインポート
-            </a>
-        </p>
+    <div class="list-actions log-actions">
+        <a 
+            href="{{ route('stocks.import.create') }}"
+            class="btn btn-secondary"
+        >
+            入出庫CSVインポート
+        </a>
 
-        <p>
-            <a href="{{ route('stocks.logs.export.csv', [
+        <a 
+            href="{{ route('stocks.logs.export.csv', [
                 'item_id' => $itemId,
                 'type' => $type,
                 'date_from' => $dateFrom,
                 'date_to' => $dateTo,
-            ]) }}">
-                入出庫履歴をCSV出力
-            </a>
-        </p>
+            ]) }}"
+            class="btn btn-secondary"
+        >
+            入出庫履歴CSV出力
+        </a>
     </div>
 
     @if (session('success'))
@@ -101,79 +118,100 @@
     @if ($logs->isEmpty())
         <p>入出庫履歴はありません。</p>
     @else
-        <table border="1">
-            <thead>
-                <tr>
-                    <th>日時</th>
-                    <th>商品</th>
-                    <th>区分</th>
-                    <th>数量</th>
-                    <th>単位</th>
-                    <th>担当者</th>
-                    <th>入出庫メモ</th>
-                    <th>操作</th>
-                </tr>
-            </thead>
-
-            <tbody>
-                @foreach ($logs as $log)
+        <div class="table-wrapper">
+            <table class="table">
+                <thead>
                     <tr>
-                        <td>{{ $log->acted_at->format('Y-m-d') }}</td>
-                        <td class="text-center">
-                            {{ $log->item->name }}
-                        </td>
-                        <td>{{ $log->type === 'in' ? '入庫' : '出庫' }}</td>
-                        <td class="text-right">
-                            @if (floor($log->qty) == $log->qty)
-                                {{number_format($log->qty, 0) }}
-                            @else
-                                {{ number_format($log->qty, 2) }}
-                            @endif
-                        </td>
-                        <td class="text-center">
-                            {{ $log->item->unit }}
-                        </td>
-                        <td class="text-center">
-                            {{ $log->user->name }}
-                        </td>
-                        <td class="text-center">
-                            @if ($log->corrected_log_id)
-                                <strong>訂正理由 : </strong>
-                                {!! nl2br(e($log->correction_reason)) !!}
-                            @else
-                                {!! nl2br(e($log->note ?? '-')) !!}
-                            @endif
-                        </td>
-
-                        <td class="text-center">
-                            @if ($log->corrected_log_id)
-                                訂正記録
-                            @elseif ($log->correctionLog)
-                                訂正済み
-                            @else
-                                <a href="{{ route('stock-logs.corrections.create', $log) }}">
-                                    訂正
-                                </a>
-                            @endif
-                        </td>
+                        <th>日時</th>
+                        <th>商品</th>
+                        <th>区分</th>
+                        <th>数量</th>
+                        <th>単位</th>
+                        <th>担当者</th>
+                        <th>入出庫メモ</th>
+                        <th>操作</th>
                     </tr>
-                @endforeach
-            </tbody>
-        </table>
+                </thead>
+
+                <tbody>
+                    @foreach ($logs as $log)
+                        <tr>
+                            <td>{{ $log->acted_at->format('Y-m-d') }}</td>
+                            <td class="text-left">
+                                {{ $log->item->name }}
+                            </td>
+                            <td>{{ $log->type === 'in' ? '入庫' : '出庫' }}</td>
+                            <td class="text-right">
+                                @if (floor($log->qty) == $log->qty)
+                                    {{number_format($log->qty, 0) }}
+                                @else
+                                    {{ number_format($log->qty, 2) }}
+                                @endif
+                            </td>
+                            <td class="text-center">
+                                {{ $log->item->unit }}
+                            </td>
+                            <td class="text-center">
+                                {{ $log->user->name }}
+                            </td>
+                            <td class="text-left">
+                                @if ($log->corrected_log_id)
+                                    <strong>訂正理由 : </strong>
+                                    {!! nl2br(e($log->correction_reason)) !!}
+                                @else
+                                    {!! nl2br(e($log->note ?? '-')) !!}
+                                @endif
+                            </td>
+
+                            <td class="text-center">
+                                @if ($log->corrected_log_id)
+                                    <span class="log-status log-correction">
+                                        訂正記録
+                                    </span>
+
+                                @elseif ($log->correctionLog)
+                                    <span class="log-status log-correction">
+                                        訂正済み
+                                    </span>
+                                @else
+                                    <a 
+                                        href="{{ route('stock-logs.corrections.create', $log) }}"
+                                        class="btn btn-light btn-sm"
+                                    >
+                                        訂正
+                                    </a>
+                                @endif
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
 
         {{ $logs->links() }}
     @endif
 
-    <p>
-        <a href="{{ route('stocks.in.create') }}">入庫登録</a>
-    </p>
+        <div class="page-actions">
+            <a 
+                href="{{ route('stocks.in.create') }}"
+                class="btn btn-primary"
+            >
+                入庫登録
+            </a>
 
-    <p>
-        <a href="{{ route('stocks.out.create') }}">出庫登録</a>
-    </p>
+            <a 
+                href="{{ route('stocks.out.create') }}"
+                class="btn btn-primary"
+            >
+                出庫登録
+            </a>
 
-    <p>
-        <a href="{{ route('items.index') }}">商品一覧へ戻る</a>
-    </p>
+            <a 
+                href="{{ route('items.index') }}"
+                class="btn-light"
+            >
+                商品一覧へ戻る
+            </a>
+        </div>
 
 @endsection

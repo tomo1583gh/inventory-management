@@ -24,8 +24,8 @@
                 <ul class="main-nav">
                     <li> 
                         <a 
-                        href="{{ route('dashboard') }}"
-                        class="{{ request()->routeIs('dashboard') ? 'active' : '' }}"
+                            href="{{ route('dashboard') }}"
+                            class="{{ request()->routeIs('dashboard') ? 'active' : '' }}"
                         >
                             ダッシュボード
                         </a>
@@ -33,8 +33,8 @@
 
                     <li>
                         <a 
-                        href="{{ route('items.index') }}"
-                        class="{{ request()->routeIs('items.*') ? 'active' : '' }}"
+                            href="{{ route('items.index') }}"
+                            class="{{ request()->routeIs('items.index') ? 'active' : '' }}"
                         >
                             商品一覧
                         </a>
@@ -42,8 +42,8 @@
 
                     <li>
                         <a 
-                        href="{{ route('stocks.index') }}"
-                        class="{{ request()->routeIs('stocks.in.*') ? 'active' : '' }}"
+                            href="{{ route('stocks.index') }}"
+                            class="{{ request()->routeIs('stocks.index') ? 'active' : '' }}"
                         >
                             在庫一覧
                         </a>
@@ -51,8 +51,8 @@
 
                     <li>
                         <a 
-                        href="{{ route('stocks.in.create') }}"
-                        class="{{ request()->routeIs('stocks.in.*') ? 'active' : '' }}"
+                            href="{{ route('stocks.in.create') }}"
+                            class="{{ request()->routeIs('stocks.in.create') ? 'active' : '' }}"
                         >
                             入庫登録
                         </a>
@@ -60,8 +60,8 @@
 
                     <li>
                         <a 
-                        href="{{ route('stocks.out.create') }}"
-                        class="{{ request()->routeIs('stocks.out.*') ? 'active' : '' }}"
+                            href="{{ route('stocks.out.create') }}"
+                            class="{{ request()->routeIs('stocks.out.create') ? 'active' : '' }}"
                         >
                             出庫登録
                         </a>
@@ -69,8 +69,8 @@
 
                     <li>
                         <a 
-                        href="{{ route('stocks.logs') }}"
-                        class="{{ request()->routeIs('stocks.logs.*') ? 'active' : '' }}"
+                            href="{{ route('stocks.logs') }}"
+                            class="{{ request()->routeIs('stocks.logs') ? 'active' : '' }}"
                         >
                             入出庫履歴
                         </a>

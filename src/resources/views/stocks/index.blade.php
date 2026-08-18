@@ -59,13 +59,24 @@
     </div>
 
     <div>
-        <label for "q">商品名</label>
+        <label for="q">商品名</label>
 
         <input
             id="q"
             type="text"
             name="q"
             value="{{ $q }}"
+        >
+    </div>
+
+    <div>
+        <label for="sku">管理番号</label>
+
+        <input
+            id="sku"
+            type="text"
+            name="sku"
+            value="{{ $sku ?? '' }}"
         >
     </div>
 
@@ -151,13 +162,14 @@
                 <th>カテゴリー</th>
 
                 <th>
-                    <a href="{{ route('stocks.index', [
+                    <a href="{{ route('stocks.index', array_merge(request()->query(), [
                         'sort' => 'name',
                         'direction' =>
                             $sort === 'name' && $direction === 'asc'
                                 ? 'desc'
                                 : 'asc',
-                    ]) }}">
+                        'page' => 1,
+                    ])) }}">
                         商品名
 
                         @if ($sort === 'name')
@@ -199,6 +211,7 @@
                     <td class="text-left">
                         <a href="{{ route('items.show', $stock->id) }}">
                         {{ $stock->name }}
+                        </a>
                     </td>
                     <td class="text-center">
                         {{ $stock->sku }}
