@@ -14,23 +14,40 @@
     <h3>在庫状況</h3>
 
     <div class="dashboard-summary">
-        <div class="summary-item">
-            <span>登録商品数</span>
-            <strong>{{ $itemCount }}</strong>
-            <span>件</span>
-        </div>
 
         <div class="summary-item">
-            <span>在庫切れ商品数</span>
-            <strong>{{ $itemCount }}</strong>
-            <span>件</span>
+            <span class="summary-label">
+                登録商品数
+            </span>
+
+            <div class="summary-value">
+                <strong>{{ $itemCount }}</strong>
+                <span>件</span>
+            </div>
         </div>
 
-        <div class="summary-item">
-            <span>在庫不足商品数</span>
-            <strong>{{ $lowStockCount }}</strong>
-            <span>件</span>
+        <div class="summary-item summary-danger">
+            <span class="summary-label">
+                在庫切れ商品数
+            </span>
+
+            <div class="summary-value">
+                <strong>{{ $outOfStockCount }}</strong>
+                <span>件</span>
+            </div>
         </div>
+
+        <div class="summary-item summary-warning">
+            <span class="summary-label">
+                在庫不足商品数
+            </span>
+
+            <div class="summary-value">
+                <strong>{{ $lowStockCount }}</strong>
+                <span>件</span>
+            </div>
+        </div>
+
     </div>
 </section>
 
@@ -38,7 +55,7 @@
     <h3>在庫切れ商品</h3>
 
     <div class="table-wrapper">
-        <table class="dashboard-table">
+        <table class="table">
             <thead>
                 <tr>
                     <th>カテゴリー</th>
@@ -52,7 +69,7 @@
 
             <tbody>
                 @forelse ($outOfStockItems as $item)
-                    <tr>
+                    <tr class="stock-danger-row">
                         <td class="text-center">
                             {{ $item->category->name ?? '-' }}
                         </td>
@@ -103,7 +120,7 @@
     <h3>在庫不足商品</h3>
 
     <div class="table-wrapper">
-        <table class="dashboard-table">
+        <table class="table">
             <thead>
                 <tr>
                     <th>カテゴリー</th>
@@ -117,7 +134,7 @@
 
             <tbody>
                 @forelse ($lowStockItems as $item)
-                    <tr>
+                    <tr class="stock-warning-row">
                         <td class="text-center">
                             {{ $item->category->name ?? '-' }}
                         </td>
@@ -168,7 +185,7 @@
     <h3>最近登録された商品</h3>
 
     <div class="table-wrapper">
-        <table class="dashboard-table">
+        <table class="table">
             <thead>
                 <tr>
                     <th>登録日時</th>
@@ -220,7 +237,7 @@
     <h3>最近の入出庫履歴</h3>
 
     <div class="table-wrapper">
-        <table class="dashboard-table">
+        <table class="table">
             <thead>
                 <tr>
                     <th>日時</th>
@@ -301,11 +318,14 @@
         </table>
     </div>
 
-    <p>
-        <a href="{{ route('stocks.logs') }}">
+    <div class="dashboard-actions">
+        <a
+            href="{{ route('stocks.logs') }}"
+            class="btn-light"
+        >
             入出庫履歴をすべて見る
         </a>
-    </p>
+    </div>
 </section>
 
 @endsection

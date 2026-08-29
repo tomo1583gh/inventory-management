@@ -8,6 +8,11 @@
   flex-wrap: wrap;
 }
 
+.dashboard-actions {
+  margin-top: 20px;
+}
+
+/*  
 .summary-item {
   width: 220px;
   padding: 20px;
@@ -42,3 +47,5 @@
 .dashboard-table td {
   padding: 8px;
 }
+*/
+

@@ -4,25 +4,32 @@
 
 @section('content')
 
+<div class="auth-container">
 
     <h2>ログイン</h2>
-
-    @if ($errors->any())
-        <ul>
-            @foreach ($errors->all() as $error)
-                <li>{{ $error }}</li>
-            @endforeach
-        </ul>
-    @endif
 
     <form 
         action="{{ route('login') }}" 
         method="POST"
+        class="form-card auth-card"
     >
         @csrf
 
-        <div>
-            <label for="email">メールアドレス</label>
+    @if ($errors->any())
+        <div class="error-box">
+            <ul>
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
+        <div class="form-group">
+            <label for="email">
+                メールアドレス
+            </label>
+
             <input
                 id="email"
                 type="email"
@@ -33,8 +40,11 @@
             >
         </div>
 
-        <div>
-            <label for="password">パスワード</label>
+        <div class="form-group">
+            <label for="password">
+                パスワード
+            </label>
+
             <input
                 id="password"
                 type="password"
@@ -42,16 +52,26 @@
                 required
             >
         </div>
+        
+        <div class="form-actions">
+            <button
+                type="submit"
+                class="btn btn-primary"
+            >
+                ログイン
+            </button>
+        </div>
 
-        <button type="submit">ログイン</button>
     </form>
 
-    <p>
+    <p class="auth-register">
         アカウントをお持ちでない方は
         <a href="{{ route('register') }}">
             ユーザー登録
         </a>
         {{-- 後で管理者だけがユーザー登録できる方式に変更 --}}
     </p>
+
+</div>
 
 @endsection

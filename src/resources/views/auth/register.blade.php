@@ -4,25 +4,31 @@
 
 @section('content')
 
+<div class="auth-container">
 
     <h2>ユーザー登録</h2>
-
-    @if ($errors->any())
-        <ul>
-            @foreach ($errors->all() as $error)
-                <li>{{ $error }}</li>
-            @endforeach
-        </ul>
-    @endif
 
     <form 
         action="{{ route('register') }}" 
         method="POST"
+        class="form-card auth-card"
     >
         @csrf
 
-        <div>
-            <label for="name">ユーザー名</label>
+    @if ($errors->any())
+        <div class="error-box">
+            <ul>
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
+        <div class="form-group">
+            <label for="name">
+                ユーザー名
+            </label>
 
             <input
                 id="name"
@@ -34,8 +40,10 @@
             >
         </div>
 
-        <div>
-            <label for="email">メールアドレス</label>
+        <div class="form-group">
+            <label for="email">
+                メールアドレス
+            </label>
 
             <input
                 id="email"
@@ -43,23 +51,25 @@
                 name="email"
                 value="{{ old('email') }}"
                 required
-                autofocus="email"
+                autocomplete="email"
             >
         </div>
 
-        <div>
-            <label for="password">パスワード</label>
+        <div class="form-group">
+            <label for="password">
+                パスワード
+            </label>
 
             <input
                 id="password"
                 type="password"
                 name="password"
                 required
-                autofocus="password"
+                autocomplete="new-password"
             >
         </div>
 
-        <div>
+        <div class="form-group">
             <label for="password_confirmation">
                 パスワード確認
             </label>
@@ -73,15 +83,21 @@
             >
         </div>
         
-        <button type="submit">
-            登録
-        </button>
+        <div class="form-actions">
+            <button
+                type="submit"
+                class="btn btn-primary"
+            >
+                登録
+            </button>
+        </div>
     </form>
 
-    <p>
+    <p class="auth-register">
         <a href="{{ route('login') }}">
             ログイン画面へ戻る
         </a>
     </p>
+</div>
 
 @endsection
