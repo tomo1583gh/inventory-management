@@ -200,7 +200,7 @@
                 @forelse ($recentItems as $item)
                     <tr>
                         <td class="text-center">
-                            {{ $item->created_at->format('y/m/d H:i') }}
+                            {{ $item->created_at->format('Y/m/d H:i') }}
                         </td>
 
                         <td class="text-center">

@@ -58,13 +58,13 @@
         </div>
 
         <div class="form-group">
-            <label for="acted_at">作業日</label>
+            <label for="acted_at">作業日時</label>
 
             <input
                 id="acted_at"
-                type="date"
+                type="datetime-local"
                 name="acted_at"
-                value="{{ old('acted_at', date('Y-m-d')) }}"
+                value="{{ old('acted_at', now()->format('Y-m-d\TH:i')) }}"
             >
 
             @error('acted_at')

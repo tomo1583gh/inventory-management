@@ -211,7 +211,7 @@ class StockController extends Controller
 
             if ($status === 'normal') {
                 $status->havingRaw(
-                    'current_qty > items.minimumstock
+                    'current_qty > items.minimumStock
                     OR items.minimum_stock = 0'
                 );
             }
