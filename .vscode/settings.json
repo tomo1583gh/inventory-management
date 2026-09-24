@@ -12,5 +12,6 @@
     "forelse",
     "onclick",
     "stylesheet"
-  ]
+  ],
+  "makefile.configureOnOpen": false
 }

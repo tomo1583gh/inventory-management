@@ -62,17 +62,20 @@ class DemoDataSeeder extends Seeder
         | 商品データ
         |-------------------------------------------------
         |
-        | target_qtyは、入出庫履歴を集計した後の現在個です。
-        |
         */
 
         $items = [
+            // -------------------------------------------------
+            // 肥料
+            // -------------------------------------------------
             [
                 'name' => '化成肥料14-14-14',
                 'sku' => 'FER-001',
                 'unit' => '袋',
                 'category' => '肥料',
                 'target_qty' => 25,
+                'minimum_stock' => 10,
+                'note' => '元肥・追肥用',
             ],
             [
                 'name' => '有機配合肥料',
@@ -80,6 +83,8 @@ class DemoDataSeeder extends Seeder
                 'unit' => '袋',
                 'category' => '肥料',
                 'target_qty' => 8,
+                'minimum_stock' => 10,
+                'note' => '野菜全般に使用',
             ],
             [
                 'name' => '苦土石灰',
@@ -87,69 +92,79 @@ class DemoDataSeeder extends Seeder
                 'unit' => '袋',
                 'category' => '肥料',
                 'target_qty' => 3,
-            ],
-            [
-                'name' => '粒状ようりん',
-                'sku' => 'FER-004',
-                'unit' => '袋',
-                'category' => '肥料',
-                'target_qty' => 0,
+                'minimum_stock' => 5,
+                'note' => '土壌改良用',
             ],
             [
                 'name' => '液体肥料A',
-                'sku' => 'FER-005',
+                'sku' => 'FER-004',
                 'unit' => '本',
                 'category' => '肥料',
-                'target_qty' => 42,
+                'target_qty' => 0,
+                'minimum_stock' => 5,
+                'note' => null,
             ],
+
+            // -------------------------------------------------
+            // 農薬
+            // -------------------------------------------------
             [
                 'name' => '殺菌剤A',
                 'sku' => 'PES-001',
                 'unit' => '本',
                 'category' => '農薬',
-                'target_qty' => 2,
+                'target_qty' => 12,
+                'minimum_stock' => 5,
+                'note' => '病害対策用',
             ],
             [
                 'name' => '殺菌剤B',
                 'sku' => 'PES-002',
                 'unit' => '袋',
                 'category' => '農薬',
-                'target_qty' => 12,
+                'target_qty' => 2,
+                'minimum_stock' => 3,
+                'note' => null,
             ],
             [
                 'name' => '殺虫剤A',
                 'sku' => 'PES-003',
                 'unit' => '本',
                 'category' => '農薬',
-                'target_qty' => 1,
-            ],
-            [
-                'name' => '殺虫剤B',
-                'sku' => 'PES-004',
-                'unit' => '袋',
-                'category' => '農薬',
-                'target_qty' => 18,
+                'target_qty' => 0,
+                'minimum_stock' => 2,
+                'note' => '害虫発生時に使用',
             ],
             [
                 'name' => '展着剤',
-                'sku' => 'PES-005',
+                'sku' => 'PES-004',
                 'unit' => '本',
                 'category' => '農薬',
-                'target_qty' => 0,
+                'target_qty' => 8,
+                'minimum_stock' => 0,
+                'note' => '最低在庫数未設定のサンプル',
             ],
+
+            // -------------------------------------------------
+            // 種苗・育苗用品
+            // -------------------------------------------------
             [
                 'name' => '72穴セルトレイ',
                 'sku' => 'SED-001',
                 'unit' => '枚',
                 'category' => '種苗',
                 'target_qty' => 120,
+                'minimum_stock' => 50,
+                'note' => '育苗用',
             ],
             [
                 'name' => '128穴セルトレイ',
                 'sku' => 'SED-002',
                 'unit' => '枚',
                 'category' => '種苗',
-                'target_qty' => 85,
+                'target_qty' => 35,
+                'minimum_stock' => 50,
+                'note' => null,
             ],
             [
                 'name' => '育苗ポット9cm',
@@ -157,27 +172,30 @@ class DemoDataSeeder extends Seeder
                 'unit' => '個',
                 'category' => '種苗',
                 'target_qty' => 500,
+                'minimum_stock' => 200,
+                'note' => '鉢上げ用',
             ],
             [
                 'name' => '育苗培土',
                 'sku' => 'SED-004',
                 'unit' => '袋',
                 'category' => '種苗',
-                'target_qty' => 4,
+                'target_qty' => 0,
+                'minimum_stock' => 10,
+                'note' => '播種・育苗用',
             ],
-            [
-                'name' => '育苗箱',
-                'sku' => 'SED-005',
-                'unit' => '枚',
-                'category' => '種苗',
-                'target_qty' => 35,
-            ],
+
+            // -------------------------------------------------
+            // 資材
+            // -------------------------------------------------
             [
                 'name' => '園芸支柱120cm',
                 'sku' => 'MAT-001',
                 'unit' => '本',
                 'category' => '資材',
                 'target_qty' => 200,
+                'minimum_stock' => 50,
+                'note' => null,
             ],
             [
                 'name' => '園芸支柱180cm',
@@ -185,6 +203,8 @@ class DemoDataSeeder extends Seeder
                 'unit' => '本',
                 'category' => '資材',
                 'target_qty' => 95,
+                'minimum_stock' => 50,
+                'note' => null,
             ],
             [
                 'name' => '誘引ひも',
@@ -192,6 +212,8 @@ class DemoDataSeeder extends Seeder
                 'unit' => '巻',
                 'category' => '資材',
                 'target_qty' => 5,
+                'minimum_stock' => 10,
+                'note' => '誘引作業用',
             ],
             [
                 'name' => '防虫ネット',
@@ -199,6 +221,8 @@ class DemoDataSeeder extends Seeder
                 'unit' => '枚',
                 'category' => '資材',
                 'target_qty' => 14,
+                'minimum_stock' => 5,
+                'note' => null,
             ],
             [
                 'name' => '農業用マルチ',
@@ -206,6 +230,8 @@ class DemoDataSeeder extends Seeder
                 'unit' => '巻',
                 'category' => '資材',
                 'target_qty' => 7,
+                'minimum_stock' => 5,
+                'note' => '黒マルチ',
             ],
             [
                 'name' => '収穫用コンテナ',
@@ -213,69 +239,30 @@ class DemoDataSeeder extends Seeder
                 'unit' => '個',
                 'category' => '資材',
                 'target_qty' => 60,
+                'minimum_stock' => 20,
+                'note' => '収穫・運搬用',
             ],
-            [
-                'name' => '剪定ばさみ',
-                'sku' => 'MAT-007',
-                'unit' => '丁',
-                'category' => '資材',
-                'target_qty' => 3,
-            ],
+
+            // -------------------------------------------------
+            // その他
+            // -------------------------------------------------
             [
                 'name' => '作業用手袋M',
                 'sku' => 'OTH-001',
                 'unit' => '双',
                 'category' => 'その他',
                 'target_qty' => 30,
-            ],
-            [
-                'name' => '作業用手袋L',
-                'sku' => 'OTH-002',
-                'unit' => '双',
-                'category' => 'その他',
-                'target_qty' => 22,
+                'minimum_stock' => 10,
+                'note' => '消耗品',
             ],
             [
                 'name' => '計量カップ',
-                'sku' => 'OTH-003',
+                'sku' => 'OTH-002',
                 'unit' => '個',
                 'category' => 'その他',
                 'target_qty' => 6,
-            ],
-            [
-                'name' => '農薬用マスク',
-                'sku' => 'OTH-004',
-                'unit' => '枚',
-                'category' => 'その他',
-                'target_qty' => 4,
-            ],
-            [
-                'name' => '収穫用かご',
-                'sku' => 'OTH-005',
-                'unit' => '個',
-                'category' => 'その他',
-                'target_qty' => 16,
-            ],
-            [
-                'name' => 'ラベルシール',
-                'sku' => 'OTH-006',
-                'unit' => '冊',
-                'category' => 'その他',
-                'target_qty' => 0,
-            ],
-            [
-                'name' => '油性マーカー',
-                'sku' => 'OTH-007',
-                'unit' => '本',
-                'category' => 'その他',
-                'target_qty' => 9,
-            ],
-            [
-                'name' => '記録用ノート',
-                'sku' => 'OTH-008',
-                'unit' => '冊',
-                'category' => 'その他',
-                'target_qty' => 15,
+                'minimum_stock' => 0,
+                'note' => '最低在庫数未設定のサンプル',
             ],
         ];
 
@@ -313,6 +300,8 @@ class DemoDataSeeder extends Seeder
                         'sku' => $itemData['sku'],
                         'unit' => $itemData['unit'],
                         'category_id' => $categoryIds[$itemData['category']],
+                        'minimum_stock' => $itemData['minimum_stock'],
+                        'note' => $itemData['note'],
                         'created_at' => $itemCreatedAt,
                         'updated_at' => $itemCreatedAt,
                     ]);
@@ -333,12 +322,14 @@ class DemoDataSeeder extends Seeder
             * 確認できるように、本日の履歴も作成する　
             *  
             * 入庫と出庫を同数にしているため、
-            * 最終的な現在地は変わらない
+            * 最終的な現在庫は変わらない
             */
             $this->createTodayStockLogs(
                 $createdItemIds,
                 $userId
             );
+
+            $this->createCorrectionDemoLogs($userId);
         }
 
         /**
@@ -430,6 +421,86 @@ class DemoDataSeeder extends Seeder
                         'created_at' => $actedAt,
                         'updated_at' => $actedAt,
                     ],
+                ]);
+            }
+
+            
+        }
+
+        /**
+         * 訂正機能確認用の履歴を作成する
+         */
+        private function createCorrectionDemoLogs(int $userId): void
+        {
+            $correctionSamples = [
+                [
+                    'sku' => 'FER-001',
+                    'type' => 'out',
+                    'qty' => '5',
+                    'reason' => '出庫数量を誤って入力したため',
+                    'days_ago' => 4,
+                ],
+                [
+                    'sku' => 'SED-003',
+                    'type' => 'in',
+                    'qty' => '50',
+                    'reason' => '別の商品を誤って入庫登録したため',
+                    'days_ago' => 2,
+                ],  
+            ];
+
+            foreach ($correctionSamples as $sample) {
+                $item = DB::table('items')
+                    ->where('sku',$sample['sku'])
+                    ->first();
+
+                if (!$item) {
+                    continue;
+                }
+
+                $originalDate = now()
+                    ->subDays($sample['days_ago'])
+                    ->setTime(10,0);
+
+                /**
+                 * 誤って登録された元履歴
+                 */
+                $originalLogId = DB::table('stock_logs')
+                    ->insertGetId([
+                        'corrected_log_id' => null,
+                        'item_id' => $item->id,
+                        'user_id' => $userId,
+                        'type' => $sample['type'],
+                        'qty' => $sample['qty'],
+                        'note' => '訂正機能確認用データ',
+                        'correction_reason' => null,
+                        'acted_at' => $originalDate,
+                        'created_at' => $originalDate,
+                        'updated_at' => $originalDate,
+                    ]);
+
+                /**
+                 * 元履歴を打ち消す訂正履歴
+                 */
+                $correctionType = $sample['type'] === 'in'
+                    ? 'out'
+                    : 'in';
+
+                $correctionDate = $originalDate
+                    ->copy()
+                    ->addMinutes(30);
+
+                DB::table('stock_logs')->insert([
+                    'corrected_log_id' => $originalLogId,
+                    'item_id' => $item->id,
+                    'user_id' => $userId,
+                    'type' => $correctionType,
+                    'qty' => $sample['qty'],
+                    'note' => null,
+                    'correction_reason' => $sample['reason'],
+                    'acted_at' => $correctionDate,
+                    'created_at' => $originalDate,
+                    'updated_at' => $originalDate,
                 ]);
             }
         }

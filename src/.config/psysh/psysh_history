@@ -19,3 +19,38 @@ App\Models\Item::where('sku', 'TEST-001')->first()->minimum_stock;
 exit
 now()
 exit
+$user = App\Models\User::where('email', 'test@example.com')->first();
+$user?->isDemoUser();
+App\Models\User::select('id', 'name', 'email')->get();
+exit
+$user = App\Models\User::where('email', 'demo@example.com')->first();
+$user?->isDemoUser();
+config('app.demo_user_email');
+$user->email;
+exit
+$user = App\Models\User::where('email', 'demo@example.com')->first();
+$user?->isDemoUser();
+exit
+App\Models\User::where('email', 'demo@example.com')->first();
+App\Models\User::where('email', 'demo@example.com')->first();
+exit
+App\Models\User::where('email', 'demo@example.com')->first();
+exit
+DB::table('items')->count();
+DB::table('items')->leftJoin('stock_logs', 'items.id', '=', 'stock_logs.item_id')->select('items.name', 'items.minimum_stock', DB::raw("COALESCE(SUM(CASE WHEN stock_logs.type = 'in' THEN stock_logs.qty WHEN stock_logs.type = 'out' THEN -stock_logs.qty ELSE 0 END), 0) AS current_stock"))->groupBy('items.id', 'items.name', 'items.minimum_stock')->orderBy('items.id')->get();
+DB::table('stock_logs')->whereNotNull('corrected_log_id')->select('id', 'corrected_log_id', 'item_id', 'type', 'qty', 'correction_reason', 'acted_at')->get();
+DB::table('stock_logs')
+    ->whereIn('id', [67, 68, 69, 70])
+    ->select(
+        'id',
+        'corrected_log_id',
+        'item_id',
+        'type',
+        'qty',
+        'note',
+        'correction_reason',
+        'acted_at'
+    )
+    ->orderBy('id')
+    ->get();
+exit

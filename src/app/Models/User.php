@@ -42,4 +42,11 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
+    /**
+     * デモユーザーかどうかを判定
+     */
+    public function isDemoUser(): bool
+        {
+            return $this->email === config('app.demo_user_email');
+        }
 }

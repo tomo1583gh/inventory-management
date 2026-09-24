@@ -237,6 +237,8 @@ class ItemController extends Controller
      */
     public function destroy(Item $item)
     {
+        $this->authorize('delete', $item);
+
         $item->delete();
 
         return redirect()
