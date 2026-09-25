@@ -796,6 +796,10 @@ class StockController extends Controller
     */
     public function importCsv(StockLogImportRequest $request)
     {
+        if ($request->user()->isDemoUser()) {
+            abort(403, 'デモユーザーはCSVインポートを利用できません。');
+        }
+
         $file = $request->file('csv_file');
 
         $handle = fopen($file->getRealPath(), 'r');

@@ -28,6 +28,13 @@
 
     @csrf
 
+    @if (auth()->user()->isDemoUser())
+        <p class="demo-notice help-text">
+            ※ デモ環境ではCSVインポートは実行できません。<br>
+            CSVテンプレートのダウンロードはご利用いただけます。
+        </p>
+    @endif
+
 <p class="help-text">
     ※ CSVの列順は「管理番号、区分、数量、作業日時、入出庫メモ」です。<br>
     区分には「入庫」または「出庫」を入力してください。
@@ -43,6 +50,7 @@
             name="csv_file"
             id="csv_file"
             accept=".csv,text/csv"
+            @disabled(auth()->user()->isDemoUser())
         >
 
         @error('csv_file')
@@ -56,6 +64,7 @@
         <button
             type="submit"
             class="btn btn-primary"
+            @disabled(auth()->user()->isDemoUser())
         >
             インポート
         </button>

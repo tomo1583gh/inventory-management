@@ -20,6 +20,8 @@ return [
 
     'demo_user_email' => env('DEMO_USER_EMAIL'),
 
+    'demo_user_password' => env('DEMO_USER_PASSWORD'),
+
     /*
     |--------------------------------------------------------------------------
     | Application Environment

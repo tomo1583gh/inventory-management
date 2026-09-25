@@ -8,6 +8,31 @@
 
     <h2>ログイン</h2>
 
+    @if (config('app.demo_user_email') && config('app.demo_user_password'))
+        <div class="demo-login">
+            <p>
+                <strong>デモアカウント</strong><br>
+                このシステムをお試しいただけます。
+            </p>
+
+            <p>
+                メールアドレス：
+                {{ config('app.demo_user_email') }}<br>
+
+                パスワード：
+                {{ config('app.demo_user_password') }}
+            </p>
+
+            <button
+                type="button"
+                class="btn btn-secondary demo-fill-button"
+                onclick="fillDemoAccount()"
+            >
+                デモアカウントを入力
+            </button>
+        </div>
+    @endif
+
     <form 
         action="{{ route('login') }}" 
         method="POST"
@@ -76,5 +101,15 @@
     {{-- 後で管理者だけがユーザー登録できる方式に変更 --}}
 
 </div>
+
+<script>
+    function fillDemoAccount() {
+        document.getElementById('email').value =
+            @json(config('app.demo_user_email'));
+
+        document.getElementById('password').value =
+            @json(config('app.demo_user_password'));
+    }
+</script>
 
 @endsection

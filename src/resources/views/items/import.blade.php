@@ -27,6 +27,13 @@
 >
     @csrf
 
+    @if (auth()->user()->isDemoUser())
+        <p class="demo-notice help-text">
+            ※ デモ環境ではCSVインポートは実行できません。<br>
+            CSVテンプレートのダウンロードはご利用いただけます。
+        </p>
+    @endif
+
 <p class="help-text">
     ※ テンプレートには入力例が1行含まれています。<br>
     不要な場合は削除してから使用してください。
@@ -51,6 +58,7 @@
             name="csv_file"
             id="csv_file"
             accept=".csv,text/csv"
+            @disabled(auth()->user()->isDemoUser())
         >
 
         @if ($errors->any())
@@ -68,6 +76,7 @@
         <button
             type="submit"
             class="btn btn-primary"
+            @disabled(auth()->user()->isDemoUser())
         >
             インポート
         </button>

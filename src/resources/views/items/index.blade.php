@@ -242,6 +242,7 @@
                                         <button
                                             type="submit"
                                             class="btn btn-danger btn-sm"
+                                            @disabled(auth()->user()->isDemoUser())
                                             onclick="return confirm('この商品を削除しますか？')"
                                         >
                                             削除
