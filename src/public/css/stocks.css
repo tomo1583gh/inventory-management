@@ -49,5 +49,11 @@
   width: 220px;
 }
 
+.error.stock-warning {
+  display: none;
+}
 
+.error.stock-warning.is-visible {
+  display: block;
+}
 

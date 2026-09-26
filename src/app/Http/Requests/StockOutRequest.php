@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use App\Models\StockLog;
 
 class StockOutRequest extends FormRequest
 {
@@ -26,6 +27,40 @@ class StockOutRequest extends FormRequest
             'qty' => ['required', 'numeric', 'gt:0'],
             'note' => ['nullable', 'string', 'max:255'],
             'acted_at' => ['required', 'date'],
+        ];
+    }
+
+    public function after(): array
+    {
+        return [
+            function ($validator) {
+                if ($validator->errors()->has('item_id')
+                    || $validator->errors()->has('qty')) {
+                    return;
+                }
+
+                $currentQty = StockLog::where('item_id', $this->item_id)
+                    ->selectRaw("
+                        COALESCE(
+                            SUM(
+                                CASE
+                                    WHEN type = 'in' THEN qty
+                                    WHEN type = 'out' THEN -qty
+                                    ELSE 0
+                                END
+                            ),
+                            0
+                        ) AS current_qty
+                    ")
+                    ->value('current_qty');
+
+                if ((float) $this->qty > (float) $currentQty) {
+                    $validator->errors()->add(
+                        'qty',
+                        '現在庫を超える数量は出庫できません。'
+                    );
+                }
+            },
         ];
     }
 

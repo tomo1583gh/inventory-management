@@ -46,7 +46,39 @@ class StockController extends Controller
      */
     public function createOut()
     {
-        $items = Item::orderBy('name')->get();
+        $items = Item::query()
+            ->leftJoin(
+                'stock_logs',
+                'items.id',
+                '=',
+                'stock_logs.item_id'
+            )
+            ->select(
+                'items.id',
+                'items.name',
+                'items.sku',
+                'items.unit'
+            )
+            ->selectRaw("
+                COALESCE(
+                    SUM(
+                        CASE
+                            WHEN stock_logs.type = 'in' THEN stock_logs.qty
+                            WHEN stock_logs.type = 'out' THEN -stock_logs.qty
+                            ELSE 0
+                        END
+                    ),
+                    0
+                ) AS current_qty
+            ")
+            ->groupBy(
+                'items.id',
+                'items.name',
+                'items.sku',
+                'items.unit',
+            )
+            ->orderBy('items.name')
+            ->get();
 
         return view('stocks.out', compact('items'));
     }
