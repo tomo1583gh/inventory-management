@@ -136,7 +136,7 @@
                 <tbody>
                     @foreach ($logs as $log)
                         <tr>
-                            <td>{{ $log->acted_at->format('Y-m-d') }}</td>
+                            <td>{{ $log->acted_at->format('Y-m-d H:i') }}</td>
                             <td class="text-left">
                                 {{ $log->item->name }}
                             </td>
