@@ -11,21 +11,10 @@
 
     <h2>商品一覧</h2>
 
-    <p>
-        ログイン中
-        {{ auth()->user()->name }}
+    <p class="login-user">
+        <span class="login-label">ログイン中</span>
+        <spam class="login-name">{{ auth()->user()->name }}</spam>
     </p>
-
-    <form 
-        action="{{ route('logout') }}"
-        method="POST"
-    >
-        @csrf
-
-        <button type="submit">
-            ログアウト
-        </button>
-    </form>
 
     <div class="item-actions">
         <a 

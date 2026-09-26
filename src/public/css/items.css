@@ -89,3 +89,22 @@
   padding: 12px;
   border-radius: 6px;
 }
+
+.login-user {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.login-label {
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.login-name {
+  padding: 4px 10px;
+  border-radius: 6px;
+  background-color: #f1f5f2;
+  font-size: 1.1rem;
+  font-weight: bold;
+}
