@@ -13,7 +13,7 @@
 
     <p class="login-user">
         <span class="login-label">ログイン中</span>
-        <spam class="login-name">{{ auth()->user()->name }}</spam>
+        <span class="login-name">{{ auth()->user()->name }}</span>
     </p>
 
     <div class="item-actions">
@@ -60,6 +60,30 @@
                         {{ $category->name }}
                     </option>
                 @endforeach
+            </select>
+        </div>
+
+        <div>
+            <label for="status">在庫状況</label>
+
+            <select id="status" name="status">
+                <option value="">
+                    すべて
+                </option>
+
+                <option
+                    value="out_of_stock"
+                    @selected($status === 'out_of_stock')
+                >
+                    在庫切れ
+                </option>
+
+                <option
+                    value="low_stock"
+                    @selected($status === 'low_stock')
+                >
+                    在庫不足
+                </option>
             </select>
         </div>
 
@@ -124,6 +148,7 @@
                     'q' => $q,
                     'sku' => $sku,
                     'category_id' => $categoryId,
+                    'status' => $status,
                     'sort' => $sort,
                     'direction' => $direction,
                 ]) }}"

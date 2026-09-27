@@ -20,6 +20,7 @@ class ItemController extends Controller
         $q = $request->input('q');
         $sku = $request->input('sku');
         $categoryId = $request->input('category_id');
+        $status = $request->input('status');
 
         $sort = $request->input('sort', 'created_at');
         $direction = $request->input('direction', 'desc');
@@ -43,16 +44,75 @@ class ItemController extends Controller
             $direction = 'desc';
         }
 
+        $stockTotals = DB::table('stock_logs')
+            ->select('item_id')
+            ->selectRaw("
+                SUM(
+                    CASE
+                        WHEN type = 'in' THEN qty
+                        WHEN type = 'out' THEN -qty
+                        ELSE 0
+                    END
+                ) AS current_qty
+            ")
+            ->groupBy('item_id');
+                        
         $items = Item::with('category')
+            ->leftJoinSub(
+                $stockTotals,
+                'stock_totals',
+                function ($join) {
+                    $join->on(
+                        'items.id',
+                        '=',
+                        'stock_totals.item_id'
+                    );
+                }
+            )
+            ->select('items.*')
+            ->selectRaw(
+                'COALESCE(stock_totals.current_qty, 0) AS current_qty'
+            )
             ->when($q, function ($query, $q) {
-                $query->where('items.name', 'like', "%{$q}%");
+                $query->where(
+                    'items.name',
+                    'like',
+                    "%{$q}%"
+                );
             })
-            ->when($sku, function ($query, $sku) {
-                $query->where('items.sku', 'like', "%{$sku}%");
+            ->when($sku,function ($query, $sku) {
+                $query->where(
+                    'items.sku',
+                    'like',
+                    "%{$sku}%"
+                );
             })
-            ->when($categoryId, function ($query, $categoryId) {
-                $query->where('items.category_id', $categoryId);
-            });
+
+            ->when(
+                $categoryId,
+                function ($query,$categoryId) {
+                    $query->where(
+                        'items.category_id',
+                        $categoryId
+                    );
+                }
+            );
+
+            if ($status === 'out_of_stock') {
+                $items->WhereRaw(
+                    'COALESCE(stock_totals.current_qty,0) <= 0'
+                );
+            }
+
+            if ($status === 'low_stock') {
+                $items->whereRaw(
+                    'COALESCE(stock_totals.current_qty, 0)> 0'
+                )
+                ->where('items.minimum_stock', '>', 0)
+                ->whereRaw(
+                    'COALESCE(stock_totals.current_qty, 0) <= items.minimum_stock'
+                );
+            } 
 
         if ($sort === 'category') {
             $items->leftJoin(
@@ -78,6 +138,7 @@ class ItemController extends Controller
             'q',
             'sku',
             'categoryId',
+            'status',
             'categories',
             'sort',
             'direction'
@@ -92,6 +153,7 @@ class ItemController extends Controller
         $q = $request->input('q');
         $sku = $request->input('sku');
         $categoryId = $request->input('category_id');
+        $status = $request->input('status');
 
         $sort = $request->input('sort', 'created_at');
         $direction = $request->input('direction', 'desc');
@@ -115,16 +177,74 @@ class ItemController extends Controller
             $direction = 'desc';
         }
 
+        $stockTotals = DB::table('stock_logs')
+            ->select('item_id')
+            ->selectRaw("
+                SUM(
+                    CASE
+                        WHEN type = 'in' THEN qty
+                        WHEN type = 'out' THEN -qty
+                        ELSE 0
+                    END
+                ) AS current_qty
+            ")
+            ->groupBy('item_id');
+
         $items = Item::with('category')
+            ->leftJoinSub(
+                $stockTotals,
+                'stock_totals',
+                function ($join) {
+                    $join->on(
+                        'items.id',
+                        '=',
+                        'stock_totals.item_id'
+                    );
+                }
+            )
+            ->select('items.*')
+            ->selectRaw(
+                'COALESCE(stock_totals.current_qty, 0) AS current_qty'
+            )
             ->when($q, function ($query, $q) {
-                $query->where('items.name', 'like', "%{$q}%");
+                $query->where(
+                    'items.name',
+                    'like',
+                    "%{$q}%"
+                );
             })
             ->when($sku, function ($query, $sku) {
-                $query->where('items.sku', 'like', "%{$sku}%");
+                $query->where(
+                    'items.sku',
+                    'like',
+                    "%{$sku}%"
+                );
             })
-            ->when($categoryId, function ($query, $categoryId) {
-                $query->where('items.category_id', $categoryId);
-            });
+            ->when(
+                $categoryId,
+                function ($query, $categoryId) {
+                    $query->where(
+                        'items.category_id',
+                        $categoryId
+                    );
+                }
+            );
+
+        if ($status === 'out_of_stock') {
+            $items->whereRaw(
+                'COALESCE(stock_totals.current_qty, 0) <= 0'
+            );
+        }
+
+        if ($status === 'low_stock') {
+            $items->whereRaw(
+                'COALESCE(stock_totals.current_qty, 0) > 0'
+            )
+            ->where('items.minimum_stock', '>', 0)
+            ->whereRaw(
+                'COALESCE(stock_totals.current_qty, 0) <= items.minimum_stock'
+            );
+        }
 
         if ($sort === 'category') {
             $items->leftJoin(

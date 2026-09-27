@@ -15,7 +15,11 @@
 
     <div class="dashboard-summary">
 
-        <div class="summary-item">
+        <a 
+            href="{{ route('items.index') }}"
+            class="summary-item summary-link"
+        >
+
             <span class="summary-label">
                 登録商品数
             </span>
@@ -24,9 +28,12 @@
                 <strong>{{ $itemCount }}</strong>
                 <span>件</span>
             </div>
-        </div>
+        </a>
 
-        <div class="summary-item summary-danger">
+        <a
+            href="{{ route('items.index', ['status' => 'out_of_stock']) }}"
+            class="summary-item summary-danger summary-link"
+        >
             <span class="summary-label">
                 在庫切れ商品数
             </span>
@@ -35,9 +42,12 @@
                 <strong>{{ $outOfStockCount }}</strong>
                 <span>件</span>
             </div>
-        </div>
+        </a>
 
-        <div class="summary-item summary-warning">
+        <a
+            href="{{ route('items.index', ['status' => 'low_stock']) }}"
+            class="summary-item summary-warning summary-link"
+        >
             <span class="summary-label">
                 在庫不足商品数
             </span>
@@ -46,8 +56,7 @@
                 <strong>{{ $lowStockCount }}</strong>
                 <span>件</span>
             </div>
-        </div>
-
+        </a>
     </div>
 </section>
 
