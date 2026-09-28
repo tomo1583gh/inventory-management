@@ -182,13 +182,14 @@
                 <th>単位</th>
 
                 <th>
-                    <a href="{{ route('stocks.index', [
+                    <a href="{{ route('stocks.index', array_merge(request()->query(), [
                         'sort' => 'stock',
                         'direction' =>
                             $sort === 'stock' && $direction === 'asc'
                                 ? 'desc'
                                 : 'asc',
-                    ]) }}">
+                        'page' => 1,
+                    ])) }}">
                         現在庫数
 
                         @if ($sort === 'stock')
@@ -209,7 +210,10 @@
                         {{ $stock->category_name ?? '未設定' }}
                     </td>
                     <td class="text-left">
-                        <a href="{{ route('items.show', $stock->id) }}">
+                        <a
+                            href="{{ route('items.show', $stock->id) }}"
+                            class="item-link"
+                        >
                         {{ $stock->name }}
                         </a>
                     </td>

@@ -14,42 +14,42 @@
         <table class="detail-table">
             <tr>
                 <th>カテゴリー</th>
-                <td class="text-center">
+                <td>
                     {{ $item->category->name ?? '未設定' }}
                 </td>
             </tr>
 
             <tr>
                 <th>商品名</th>
-                <td class="text-center">
+                <td>
                     {{ $item->name }}
                 </td>
             </tr>
 
             <tr>
                 <th>管理番号</th>
-                <td class="text-center">
+                <td>
                     {{ $item->sku }}
                 </td>
             </tr>
 
             <tr>
                 <th>単位</th>
-                <td class="text-center">
+                <td>
                     {{ $item->unit }}
                 </td>
             </tr>
 
             <tr>
                 <th>最低在庫数</th>
-                <td class="text-right">
+                <td>
                     {{ $item->minimum_stock }}
                 </td>
             </tr>
 
             <tr>
                 <th>現在在庫数</th>
-                <td class="text-right">
+                <td>
                     @if (floor($currentQty) == $currentQty)
                         {{ number_format($currentQty, 0) }}
                     @else
@@ -60,7 +60,7 @@
 
             <tr>
                 <th>在庫状況</th>
-                <td class="text-center">
+                <td>
                     @if ($currentQty <= 0)
                         <span class="stock-status stock-out">
                             在庫切れ
@@ -80,10 +80,12 @@
                 </td>
             </tr>
 
-            <tr>
-                <th>商品メモ</th>
+            <tr class="memo-row">
+                <td colspan="2">
+                    <div class="memo-label">
+                        商品メモ
+                    </div>
 
-                <td>
                     <div class="memo-box">
                         {!! nl2br(e($item->note ?? '')) !!}
                     </div>

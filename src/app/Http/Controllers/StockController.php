@@ -228,13 +228,13 @@ class StockController extends Controller
             *　在庫状況検索
             */
             if ($status === 'out') {
-                $status->havingRaw(
+                $stocks->havingRaw(
                     'current_qty <= 0'
                 );
             }
 
             if ($status === 'low') {
-                $status->havingRaw(
+                $stocks->havingRaw(
                     'current_qty > 0
                     AND items.minimum_stock > 0
                     AND current_qty <= items.minimum_stock'
@@ -242,8 +242,8 @@ class StockController extends Controller
             }
 
             if ($status === 'normal') {
-                $status->havingRaw(
-                    'current_qty > items.minimumStock
+                $stocks->havingRaw(
+                    'current_qty > items.minimum_stock
                     OR items.minimum_stock = 0'
                 );
             }

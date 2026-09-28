@@ -22,6 +22,20 @@
 .summary-link:hover {
   color: #333;
   transform: translateY(-2px);
-  box-shadow: 0 4px 10px rgba(0,0,0,0.12);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
 }
 
+@media (max-width: 768px) {
+  .dashboard-summary {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .summary-item {
+    width: 100%;
+  }
+
+  .summary-label {
+    margin-bottom: 8px;
+  }
+}

@@ -3,7 +3,10 @@
 
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>@yield('title', '在庫管理システム')</title>
+
     <link rel="stylesheet" href="{{ asset('css/app.css') }}">
 
     @yield('css')
@@ -20,6 +23,12 @@
         </h1>
 
         @auth
+
+            <p class="login-user">
+                <span class="login-label">ログイン中</span>
+                <span class="login-name">{{ auth()->user()->name }}</span>
+            </p>
+
             <nav>
                 <ul class="main-nav">
                     <li> 

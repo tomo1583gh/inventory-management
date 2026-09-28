@@ -57,3 +57,37 @@
   display: block;
 }
 
+.table th a {
+  color: #222;
+  text-decoration: none;
+}
+
+.table th a:hover {
+  color: #2e7d32;
+  text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+  .log-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+    gap: 10px;
+  }
+
+  .log-actions .btn {
+    width: 100%;
+  }
+
+  .page-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .page-actions .btn,
+  .page-actions .btn-light {
+    width: 100%;
+    text-align: center;
+  }
+}

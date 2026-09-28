@@ -1,4 +1,4 @@
-@extends('layouts.app')
+a@extends('layouts.app')
 
 @section('css')
     <link rel="stylesheet" href="{{ asset('css/stocks.css') }}">
@@ -138,7 +138,12 @@
                         <tr>
                             <td>{{ $log->acted_at->format('Y-m-d H:i') }}</td>
                             <td class="text-left">
-                                {{ $log->item->name }}
+                                <a
+                                    href="{{ route('items.show', $log->item) }}"
+                                    class="item-link"
+                                >
+                                    {{ $log->item->name }}
+                                </a>
                             </td>
                             <td>{{ $log->type === 'in' ? '入庫' : '出庫' }}</td>
                             <td class="text-right">

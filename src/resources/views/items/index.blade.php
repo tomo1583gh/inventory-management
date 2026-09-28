@@ -11,11 +11,6 @@
 
     <h2>商品一覧</h2>
 
-    <p class="login-user">
-        <span class="login-label">ログイン中</span>
-        <span class="login-name">{{ auth()->user()->name }}</span>
-    </p>
-
     <div class="item-actions">
         <a 
             href="{{ route('items.create') }}"
@@ -230,7 +225,10 @@
                             <td class="text-center">{{ $item->id }}</td>
                             <td class="text-center">{{ $item->category?->name ?? '未設定' }}</td>
                             <td class="text-left">
-                                <a href="{{ route('items.show', $item) }}">
+                                <a
+                                    href="{{ route('items.show', $item) }}"
+                                    class="item-link"
+                                >
                                     {{ $item->name }}
                                 </a>
                             </td>

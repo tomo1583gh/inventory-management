@@ -84,7 +84,10 @@
                         </td>
 
                         <td>
-                            <a href="{{ route('items.show', $item->id) }}">
+                            <a
+                                href="{{ route('items.show', $item->id) }}"
+                                class="item-link"
+                            >
                                 {{ $item->name }}
                             </a>
                         </td>
@@ -149,7 +152,10 @@
                         </td>
 
                         <td>
-                            <a href="{{ route('items.show', $item->id) }}">
+                            <a
+                                href="{{ route('items.show', $item->id) }}"
+                                class="item-link"
+                            >
                                 {{ $item->name }}
                             </a>
                         </td>
@@ -217,7 +223,10 @@
                         </td>
 
                         <td>
-                            <a href="{{ route('items.show',$item) }}">
+                            <a
+                                href="{{ route('items.show',$item) }}"
+                                class="item-link"
+                            >
                                 {{ $item->name }}
                             </a>
                         </td>
@@ -269,7 +278,10 @@
 
                         <td>
                             @if ($log->item)
-                            <a href="{{ route('items.show', $log->item) }}">
+                            <a
+                                href="{{ route('items.show', $log->item) }}"
+                                class="item-link"
+                            >
                                 {{ $log->item->name }}
                             </a>
                             @else

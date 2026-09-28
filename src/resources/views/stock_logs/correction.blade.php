@@ -38,7 +38,7 @@
 
             <tr>
                 <th>数量</th>
-                <td class="text-right">
+                <td>
                     @if (floor($stockLog->qty) == $stockLog->qty)
                         {{ number_format($stockLog->qty, 0) }}
                     @else
