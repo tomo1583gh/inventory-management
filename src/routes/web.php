@@ -18,6 +18,8 @@ use App\Http\Controllers\DashboardController;
 
 Route::get('/', fn () => redirect()->route('dashboard'));
 
+Route::redirect('/home', '/dashboard');
+
 Route::middleware(['auth'])->group(function () {
     // 商品一覧csv出力
     Route::get('/items/export/csv', [ItemController::class, 'exportCsv'])
