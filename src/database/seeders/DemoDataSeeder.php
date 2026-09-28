@@ -30,7 +30,7 @@ class DemoDataSeeder extends Seeder
             $userId = DB::table('users')->insertGetId([
                 'name' =>'デモユーザー',
                 'email' => 'demo@example.com',
-                'password' => Hash::make('password'),
+                'password' => Hash::make('IMdemo-2026-erdbeere'),
                 'email_verified_at' => now(),
                 'created_at' => now(),
                 'updated_at' => now(),
