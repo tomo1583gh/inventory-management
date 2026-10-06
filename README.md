@@ -131,30 +131,40 @@ PCだけでなくスマートフォンからも主要な操作ができるよう
 
 などを確認しています。
 
+### テスト実行
+
+`docker compose exec php php artisan test`
+
 ## 使用技術
 
 ### バックエンド
-- PHP
-- Laravel
-- Laravel Fortify
+- PHP 8.2.29
+- Laravel 10.50.0
+- Laravel Fortify（認証）
 
 ### フロントエンド
+- Blade
 - HTML
 - CSS
 - JavaScript
 
 ### データベース
-- MySQL
+- MySQL 8.0
 
-### 開発・インフラ
-- Docker / Docker Compose
-- Nginx
-- Ubuntu
-- ConoHa VPS
+### 開発環境
+- Docker
+- Docker Compose
 - Git / GitHub
 
+### 本番環境
+- ConoHa VPS
+- Ubuntu 24.04 LTS
+- Nginx 1.24
+- Docker / Docker Compose
+- Certbot（HTTPS / SSL証明書）
+
 ## 環境構築
-### dockerビルド
+### Dockerビルド
 
 1. リポジトリのクローン
 
