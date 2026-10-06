@@ -131,10 +131,6 @@ PCだけでなくスマートフォンからも主要な操作ができるよう
 
 などを確認しています。
 
-### テスト実行
-
-`docker compose exec php php artisan test`
-
 ## 使用技術
 
 ### バックエンド
@@ -164,28 +160,27 @@ PCだけでなくスマートフォンからも主要な操作ができるよう
 - Certbot（HTTPS / SSL証明書）
 
 ## 環境構築
+
 ### Dockerビルド
 
-1. リポジトリのクローン
+1. リポジトリをクローン
 
-   `git clone https://github.com/tomo1583gh/inventory-management.git`
+    `git clone https://github.com/tomo1583gh/inventory-management.git`
 
-2. 階層を変更
+2. プロジェクトディレクトリへ移動
 
     `cd inventory-management`
 
-3. Dockerコンテナのビルド・起動
+3. Dockerコンテナをビルド・起動
 
     `docker compose up -d --build`
 
-    ※  MySQLは、OSによって起動しない場合があるのでそれぞれのPCに合わせてdocker-compose.ymlファイルを編集して下さい。
-
-    ※　Linux / WSL 環境で以下のような警告が出る場合は、「UID/GID の設定（Linux/WSL 推奨）」を参照してください。
+    ※ Linux / WSL環境で以下のような警告が出る場合は、「UID/GID の設定（Linux/WSL 推奨）」を参照してください。
 
 ```text
-    WARN The "UID" variable is not set. Defaulting to a blank string.
-    WARN The "GID" variable is not set. Defaulting to a blank string.
-```    
+WARN The "UID" variable is not set. Defaulting to a blank string.
+WARN The "GID" variable is not set. Defaulting to a blank string.
+```
 
 ### Laravelセットアップ
 
@@ -197,11 +192,9 @@ PCだけでなくスマートフォンからも主要な操作ができるよう
 
     `composer install`
 
-3. .envファイルを作成
+3. `.env` ファイルを作成
 
     `cp .env.example .env`
-
-    必要に応じて環境変数を編集
 
 4. アプリケーションキーを生成
 
@@ -215,11 +208,20 @@ PCだけでなくスマートフォンからも主要な操作ができるよう
 
     `php artisan db:seed`
 
-7. Mailhog起動（別途インストール必要）
-
-    http://localhost:8025 にアクセスし、送信メールを確認出来ます  
-    `.env`のMAIL_HOST=mailhogを設定してください
-
-8. ブラウザでアプリにアクセス
+7. ブラウザでアプリにアクセス
 
     `http://localhost`
+
+### Mailhog
+
+Dockerコンテナ起動時にMailhogも起動します。
+
+ブラウザで以下にアクセスすると、開発環境で送信されたメールを確認できます。
+
+`http://localhost:8025`
+
+### テスト
+
+PHPコンテナ内で以下を実行します。
+
+`php artisan test`
