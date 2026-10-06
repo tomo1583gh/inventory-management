@@ -20,17 +20,29 @@ class DemoDataSeeder extends Seeder
         |-------------------------------------------------
         */
 
+        $demoEmail = config('app.demo_user_email');
+        $demoPassword = config('app.demo_user_password');
+
         $user = DB::table('users')
-            ->where('email', 'demo@example.com')
+            ->where('email', $demoEmail)
             ->first();
 
         if ($user) {
             $userId = $user->id;
+
+            DB::table('users')
+                ->where('id', $userId)
+                ->update([
+                    'name' => 'デモユーザー',
+                    'password' => Hash::make($demoPassword),
+                    'email_verified_at' => now(),
+                    'updated_at' => now(),
+                ]);
         } else {
             $userId = DB::table('users')->insertGetId([
-                'name' =>'デモユーザー',
-                'email' => 'demo@example.com',
-                'password' => Hash::make('IMdemo-2026-erdbeere'),
+                'name' => 'デモユーザー',
+                'email' => $demoEmail,
+                'password' => Hash::make($demoPassword),
                 'email_verified_at' => now(),
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -291,219 +303,215 @@ class DemoDataSeeder extends Seeder
             $existingItem = DB::table('items')
                 ->where('sku', $itemData['sku'])
                 ->first();
-            
-                if ($existingItem) {
-                    $itemId = $existingItem->id;
-                } else {
-                    $itemId = DB::table('items')->insertGetId([
-                        'name' => $itemData['name'],
-                        'sku' => $itemData['sku'],
-                        'unit' => $itemData['unit'],
-                        'category_id' => $categoryIds[$itemData['category']],
-                        'minimum_stock' => $itemData['minimum_stock'],
-                        'note' => $itemData['note'],
-                        'created_at' => $itemCreatedAt,
-                        'updated_at' => $itemCreatedAt,
-                    ]);
 
-                    $this->createStockLogs(
-                        $itemId,
-                        $userId,
-                        $itemData['target_qty'],
-                        $itemCreatedAt
-                    );
-                }
+            if ($existingItem) {
+                $itemId = $existingItem->id;
+            } else {
+                $itemId = DB::table('items')->insertGetId([
+                    'name' => $itemData['name'],
+                    'sku' => $itemData['sku'],
+                    'unit' => $itemData['unit'],
+                    'category_id' => $categoryIds[$itemData['category']],
+                    'minimum_stock' => $itemData['minimum_stock'],
+                    'note' => $itemData['note'],
+                    'created_at' => $itemCreatedAt,
+                    'updated_at' => $itemCreatedAt,
+                ]);
 
-                $createdItemIds[] = $itemId;
+                $this->createStockLogs(
+                    $itemId,
+                    $userId,
+                    $itemData['target_qty'],
+                    $itemCreatedAt
+                );
             }
 
-            /*
+            $createdItemIds[] = $itemId;
+        }
+
+        /*
             * ダッシュボードの「本日の入庫・出庫件数」を 
             * 確認できるように、本日の履歴も作成する　
             *  
             * 入庫と出庫を同数にしているため、
             * 最終的な現在庫は変わらない
             */
-            $this->createTodayStockLogs(
-                $createdItemIds,
-                $userId
-            );
+        $this->createTodayStockLogs(
+            $createdItemIds,
+            $userId
+        );
 
-            $this->createCorrectionDemoLogs($userId);
+        $this->createCorrectionDemoLogs($userId);
+    }
+
+    /**
+     * 指定した現在庫になるように入出庫履歴を作成する
+     */
+    private function createStockLogs(
+        int $itemId,
+        int $userId,
+        int $targetQty,
+        Carbon $baseDate
+    ): void {
+        $firstOutQty = ($itemId % 5) + 3;
+        $secondOutQty = ($itemId % 4) + 1;
+
+        $totalOutQty = $firstOutQty + $secondOutQty;
+        $initialInQty = $targetQty + $totalOutQty;
+
+        $firstInDate = $baseDate->copy()->addDay();
+        $firstOutDate = $baseDate->copy()->addDays(3);
+        $secondOutDate = $baseDate->copy()->addDays(5);
+
+        DB::table('stock_logs')->insert([
+            [
+                'item_id' => $itemId,
+                'user_id' => $userId,
+                'type' => 'in',
+                'qty' => $initialInQty,
+                'acted_at' => $firstInDate,
+                'created_at' => $firstInDate,
+                'updated_at' => $firstInDate,
+            ],
+            [
+                'item_id' => $itemId,
+                'user_id' => $userId,
+                'type' => 'out',
+                'qty' => $firstOutQty,
+                'acted_at' => $firstOutDate,
+                'created_at' => $firstOutDate,
+                'updated_at' => $firstOutDate,
+            ],
+            [
+                'item_id' => $itemId,
+                'user_id' => $userId,
+                'type' => 'out',
+                'qty' => $secondOutQty,
+                'acted_at' => $secondOutDate,
+                'created_at' => $secondOutDate,
+                'updated_at' => $secondOutDate,
+            ],
+        ]);
+    }
+
+    /*
+        * ダッシュボード確認用の本日の入出庫履歴を作成する
+        */
+    private function createTodayStockLogs(
+        array $itemIds,
+        int $userId
+    ): void {
+        $todayDemoExists = DB::table('stock_logs')
+            ->whereDate('acted_at', today())
+            ->whereIn('item_id', array_slice($itemIds, 0, 3))
+            ->exists();
+
+        if ($todayDemoExists) {
+            return;
         }
 
-        /**
-         * 指定した現在庫になるように入出庫履歴を作成する
-        */
-        private function createStockLogs(
-            int $itemId,
-            int $userId,
-            int $targetQty,
-            Carbon $baseDate
-        ): void {
-            $firstOutQty = ($itemId % 5) + 3;
-            $secondOutQty = ($itemId % 4) + 1;
-
-            $totalOutQty = $firstOutQty + $secondOutQty;
-            $initialInQty = $targetQty + $totalOutQty;
-
-            $firstInDate = $baseDate->copy()->addDay();
-            $firstOutDate = $baseDate->copy()->addDays(3);
-            $secondOutDate = $baseDate->copy()->addDays(5);
+        foreach (array_slice($itemIds, 0, 3) as $index => $itemId) {
+            $qty = $index + 1;
+            $actedAt = now();
 
             DB::table('stock_logs')->insert([
                 [
                     'item_id' => $itemId,
                     'user_id' => $userId,
                     'type' => 'in',
-                    'qty' => $initialInQty,
-                    'acted_at' => $firstInDate,
-                    'created_at' => $firstInDate,
-                    'updated_at' => $firstInDate,
+                    'qty' => $qty,
+                    'acted_at' => $actedAt,
+                    'created_at' => $actedAt,
+                    'updated_at' => $actedAt,
                 ],
                 [
                     'item_id' => $itemId,
                     'user_id' => $userId,
                     'type' => 'out',
-                    'qty' => $firstOutQty,
-                    'acted_at' => $firstOutDate,
-                    'created_at' => $firstOutDate,
-                    'updated_at' => $firstOutDate,
-                ],
-                [
-                    'item_id' => $itemId,
-                    'user_id' => $userId,
-                    'type' => 'out',
-                    'qty' => $secondOutQty,
-                    'acted_at' => $secondOutDate,
-                    'created_at' => $secondOutDate,
-                    'updated_at' => $secondOutDate,
+                    'qty' => $qty,
+                    'acted_at' => $actedAt,
+                    'created_at' => $actedAt,
+                    'updated_at' => $actedAt,
                 ],
             ]);
         }
+    }
 
-        /*
-        * ダッシュボード確認用の本日の入出庫履歴を作成する
-        */
-        private function createTodayStockLogs(
-            array $itemIds,
-            int $userId
-        ): void {
-            $todayDemoExists = DB::table('stock_logs')
-                ->whereDate('acted_at', today())
-                ->whereIn('item_id', array_slice($itemIds, 0, 3))
-                ->exists();
+    /**
+     * 訂正機能確認用の履歴を作成する
+     */
+    private function createCorrectionDemoLogs(int $userId): void
+    {
+        $correctionSamples = [
+            [
+                'sku' => 'FER-001',
+                'type' => 'out',
+                'qty' => '5',
+                'reason' => '出庫数量を誤って入力したため',
+                'days_ago' => 4,
+            ],
+            [
+                'sku' => 'SED-003',
+                'type' => 'in',
+                'qty' => '50',
+                'reason' => '別の商品を誤って入庫登録したため',
+                'days_ago' => 2,
+            ],
+        ];
 
-            if ($todayDemoExists) {
-                return;
+        foreach ($correctionSamples as $sample) {
+            $item = DB::table('items')
+                ->where('sku', $sample['sku'])
+                ->first();
+
+            if (!$item) {
+                continue;
             }
 
-            foreach (array_slice($itemIds, 0, 3) as $index => $itemId) {
-                $qty = $index + 1;
-                $actedAt = now();
+            $originalDate = now()
+                ->subDays($sample['days_ago'])
+                ->setTime(10, 0);
 
-                DB::table('stock_logs')->insert([
-                    [
-                        'item_id' => $itemId,
-                        'user_id' => $userId,
-                        'type' => 'in',
-                        'qty' => $qty,
-                        'acted_at' => $actedAt,
-                        'created_at' => $actedAt,
-                        'updated_at' => $actedAt, 
-                    ],
-                    [
-                        'item_id' => $itemId,
-                        'user_id' => $userId,
-                        'type' => 'out',
-                        'qty' => $qty,
-                        'acted_at' => $actedAt,
-                        'created_at' => $actedAt,
-                        'updated_at' => $actedAt,
-                    ],
-                ]);
-            }
-
-            
-        }
-
-        /**
-         * 訂正機能確認用の履歴を作成する
-         */
-        private function createCorrectionDemoLogs(int $userId): void
-        {
-            $correctionSamples = [
-                [
-                    'sku' => 'FER-001',
-                    'type' => 'out',
-                    'qty' => '5',
-                    'reason' => '出庫数量を誤って入力したため',
-                    'days_ago' => 4,
-                ],
-                [
-                    'sku' => 'SED-003',
-                    'type' => 'in',
-                    'qty' => '50',
-                    'reason' => '別の商品を誤って入庫登録したため',
-                    'days_ago' => 2,
-                ],  
-            ];
-
-            foreach ($correctionSamples as $sample) {
-                $item = DB::table('items')
-                    ->where('sku',$sample['sku'])
-                    ->first();
-
-                if (!$item) {
-                    continue;
-                }
-
-                $originalDate = now()
-                    ->subDays($sample['days_ago'])
-                    ->setTime(10,0);
-
-                /**
-                 * 誤って登録された元履歴
-                 */
-                $originalLogId = DB::table('stock_logs')
-                    ->insertGetId([
-                        'corrected_log_id' => null,
-                        'item_id' => $item->id,
-                        'user_id' => $userId,
-                        'type' => $sample['type'],
-                        'qty' => $sample['qty'],
-                        'note' => '訂正機能確認用データ',
-                        'correction_reason' => null,
-                        'acted_at' => $originalDate,
-                        'created_at' => $originalDate,
-                        'updated_at' => $originalDate,
-                    ]);
-
-                /**
-                 * 元履歴を打ち消す訂正履歴
-                 */
-                $correctionType = $sample['type'] === 'in'
-                    ? 'out'
-                    : 'in';
-
-                $correctionDate = $originalDate
-                    ->copy()
-                    ->addMinutes(30);
-
-                DB::table('stock_logs')->insert([
-                    'corrected_log_id' => $originalLogId,
+            /**
+             * 誤って登録された元履歴
+             */
+            $originalLogId = DB::table('stock_logs')
+                ->insertGetId([
+                    'corrected_log_id' => null,
                     'item_id' => $item->id,
                     'user_id' => $userId,
-                    'type' => $correctionType,
+                    'type' => $sample['type'],
                     'qty' => $sample['qty'],
-                    'note' => null,
-                    'correction_reason' => $sample['reason'],
-                    'acted_at' => $correctionDate,
+                    'note' => '訂正機能確認用データ',
+                    'correction_reason' => null,
+                    'acted_at' => $originalDate,
                     'created_at' => $originalDate,
                     'updated_at' => $originalDate,
                 ]);
-            }
+
+            /**
+             * 元履歴を打ち消す訂正履歴
+             */
+            $correctionType = $sample['type'] === 'in'
+                ? 'out'
+                : 'in';
+
+            $correctionDate = $originalDate
+                ->copy()
+                ->addMinutes(30);
+
+            DB::table('stock_logs')->insert([
+                'corrected_log_id' => $originalLogId,
+                'item_id' => $item->id,
+                'user_id' => $userId,
+                'type' => $correctionType,
+                'qty' => $sample['qty'],
+                'note' => null,
+                'correction_reason' => $sample['reason'],
+                'acted_at' => $correctionDate,
+                'created_at' => $originalDate,
+                'updated_at' => $originalDate,
+            ]);
         }
     }
-
-
+}
